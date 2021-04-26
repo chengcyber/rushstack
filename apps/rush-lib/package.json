@@ -54,7 +54,8 @@
     "tar": "~5.0.5",
     "true-case-path": "~2.2.1",
     "wordwrap": "~1.0.0",
-    "z-schema": "~3.18.3"
+    "z-schema": "~3.18.3",
+    "@npmcli/config": "~2.1.0"
   },
   "devDependencies": {
     "@rushstack/eslint-config": "workspace:*",

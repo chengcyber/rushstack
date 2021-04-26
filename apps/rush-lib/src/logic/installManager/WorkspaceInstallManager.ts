@@ -31,11 +31,14 @@ import { PnpmShrinkwrapFile, IPnpmShrinkwrapImporterYaml } from '../pnpm/PnpmShr
 import { PnpmPackageManager } from '../../api/packageManager/PnpmPackageManager';
 import { LastLinkFlagFactory } from '../../api/LastLinkFlag';
 import { EnvironmentConfiguration } from '../../api/EnvironmentConfiguration';
+import { NpmrcManager } from '../NpmrcManager';
 
 /**
  * This class implements common logic between "rush install" and "rush update".
  */
 export class WorkspaceInstallManager extends BaseInstallManager {
+  private _shouldSkipWorkspaceProtocol: boolean | null = null;
+
   /**
    * @override
    */
@@ -169,6 +172,11 @@ export class WorkspaceInstallManager extends BaseInstallManager {
         const referencedLocalProject:
           | RushConfigurationProject
           | undefined = this.rushConfiguration.getProjectByName(name);
+
+        const shouldSkipWorkspaceProtocol: boolean = await this._getShouldSkipWorkspaceProtocol();
+        if (shouldSkipWorkspaceProtocol) {
+          continue;
+        }
 
         // Validate that local projects are referenced with workspace notation. If not, and it is not a
         // cyclic dependency, then it needs to be updated to specify `workspace:*` explicitly. Currently only
@@ -589,7 +597,10 @@ export class WorkspaceInstallManager extends BaseInstallManager {
     // Add workspace-specific args
     if (this.rushConfiguration.packageManager === 'pnpm') {
       args.push('--recursive');
-      args.push('--link-workspace-packages', 'false');
+
+      if (!this._shouldSkipWorkspaceProtocol) {
+        args.push('--link-workspace-packages', 'false');
+      }
 
       for (const arg of this.options.pnpmFilterArguments) {
         args.push(arg);
@@ -630,5 +641,37 @@ export class WorkspaceInstallManager extends BaseInstallManager {
     }
 
     return false; // none found
+  }
+
+  protected async _getShouldSkipWorkspaceProtocol(): Promise<boolean> {
+    if (this._shouldSkipWorkspaceProtocol === null) {
+      let shouldSkip: boolean = false;
+
+      if (this.rushConfiguration.packageManager === 'pnpm') {
+        const pnpmVersion: string = this.rushConfiguration.packageManagerToolVersion;
+        // prefer-workspace-packages added in pnpm@5.13.0
+        if (semver.gte(pnpmVersion, '5.13.0')) {
+          const npmrcManger: NpmrcManager = new NpmrcManager(this.rushConfiguration);
+
+          const preferWorksapcePackages: boolean | undefined = await npmrcManger.get(
+            'prefer-workspace-packages'
+          );
+          // if prefer-workspace-packages set, no need write workspace protocol
+          shouldSkip = !!preferWorksapcePackages;
+        } else {
+          console.log(
+            colors.yellow(
+              Utilities.wrapWords(
+                `"prefer-workspace-packages" is set in npmrc, but it was added in pnpm@5.13.0. ` +
+                  `Current pnpm version is ${pnpmVersion}. Please update pnpmVersion in rush.json`
+              )
+            )
+          );
+        }
+      }
+
+      this._shouldSkipWorkspaceProtocol = shouldSkip;
+    }
+    return Boolean(this._shouldSkipWorkspaceProtocol);
   }
 }
