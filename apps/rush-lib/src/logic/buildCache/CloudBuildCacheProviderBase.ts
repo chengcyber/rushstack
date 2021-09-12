@@ -3,6 +3,9 @@
 
 import { Terminal } from '@rushstack/node-core-library';
 
+/**
+ * @beta
+ */
 export abstract class CloudBuildCacheProviderBase {
   public abstract readonly isCacheWriteAllowed: boolean;
 
