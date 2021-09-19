@@ -11,7 +11,6 @@ import * as fetch from 'node-fetch';
 import { IPackageJson } from '@rushstack/node-core-library';
 import { ITerminalProvider } from '@rushstack/node-core-library';
 import { JsonObject } from '@rushstack/node-core-library';
-import { JsonSchema } from '@rushstack/node-core-library';
 import { PackageNameParser } from '@rushstack/node-core-library';
 import { Terminal } from '@rushstack/node-core-library';
 
@@ -346,13 +345,9 @@ export interface IRushLifecycle {
 }
 
 // @public (undocumented)
-export interface IRushPlugin<TOptions = void> {
+export interface IRushPlugin {
     // (undocumented)
-    apply(rushSession: RushSession, rushConfiguration: RushConfiguration, options: TOptions): void;
-    // (undocumented)
-    readonly optionsSchema?: JsonSchema;
-    // (undocumented)
-    readonly pluginName: string;
+    apply(rushSession: RushSession, rushConfiguration: RushConfiguration): void;
 }
 
 // @public (undocumented)
@@ -714,6 +709,8 @@ export class RushSession implements IRushLifecycle {
     getLogger(name: string): Logger;
     // (undocumented)
     readonly hooks: RushLifecycleHooks;
+    // (undocumented)
+    get terminalProvider(): ITerminalProvider;
 }
 
 // @beta
