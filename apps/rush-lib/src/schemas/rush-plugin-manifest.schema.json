@@ -1,0 +1,7 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "Rush plugin package manifest",
+  "description": "This file declares what kind of plugins this package provided.",
+  "type": "object",
+  "additionalProperties": false
+}

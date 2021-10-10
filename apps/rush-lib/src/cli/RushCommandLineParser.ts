@@ -138,17 +138,7 @@ export class RushCommandLineParser extends CommandLineParser {
   public async execute(args?: string[]): Promise<boolean> {
     this._terminalProvider.verboseEnabled = this.isDebug;
 
-    const pluginsAutoinstallerName: string | undefined =
-      this.rushConfiguration.rushConfigurationJson.pluginsAutoinstallerName;
-    if (pluginsAutoinstallerName) {
-      const autoinstaller: Autoinstaller = new Autoinstaller(
-        pluginsAutoinstallerName,
-        this.rushConfiguration
-      );
-      await autoinstaller.prepareAsync();
-    }
-
-    await this._initializePluginsAsync();
+    await this._pluginManager.initializePluginsAsync();
     await this.rushSession.hooks.initialize.promise();
 
     return await super.execute(args);
@@ -199,12 +189,6 @@ export class RushCommandLineParser extends CommandLineParser {
     if (this.telemetry) {
       this.flushTelemetry();
     }
-  }
-
-  private async _initializePluginsAsync(): Promise<void> {
-    this._pluginManager.initializeDefaultPlugins();
-
-    await this._pluginManager.initializePluginsFromConfigFileAsync();
   }
 
   private _populateActions(): void {
