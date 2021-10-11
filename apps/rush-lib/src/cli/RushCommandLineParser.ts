@@ -51,7 +51,6 @@ import { SetupAction } from './actions/SetupAction';
 import { EnvironmentConfiguration } from '../api/EnvironmentConfiguration';
 import { PluginManager } from '../pluginFramework/PluginManager';
 import { RushSession } from '../pluginFramework/RushSession';
-import { Autoinstaller } from '../logic/Autoinstaller';
 
 /**
  * Options for `RushCommandLineParser`.
@@ -66,12 +65,12 @@ export class RushCommandLineParser extends CommandLineParser {
   public rushGlobalFolder!: RushGlobalFolder;
   public readonly rushConfiguration!: RushConfiguration;
   public readonly rushSession: RushSession;
+  public readonly pluginManager: PluginManager;
 
   private _debugParameter!: CommandLineFlagParameter;
   private _rushOptions: IRushCommandLineParserOptions;
   private _terminalProvider: ConsoleTerminalProvider;
   private _terminal: Terminal;
-  private _pluginManager: PluginManager;
 
   public constructor(options?: Partial<IRushCommandLineParserOptions>) {
     super({
@@ -116,7 +115,7 @@ export class RushCommandLineParser extends CommandLineParser {
       terminalProvider: this._terminalProvider
     });
     this.rushSession = rushSession;
-    this._pluginManager = new PluginManager({
+    this.pluginManager = new PluginManager({
       rushSession: rushSession,
       rushConfiguration: this.rushConfiguration,
       terminal: this._terminal
@@ -138,17 +137,10 @@ export class RushCommandLineParser extends CommandLineParser {
   public async execute(args?: string[]): Promise<boolean> {
     this._terminalProvider.verboseEnabled = this.isDebug;
 
-    const pluginsAutoinstallerName: string | undefined =
-      this.rushConfiguration.rushConfigurationJson.pluginsAutoinstallerName;
-    if (pluginsAutoinstallerName) {
-      const autoinstaller: Autoinstaller = new Autoinstaller(
-        pluginsAutoinstallerName,
-        this.rushConfiguration
-      );
-      await autoinstaller.prepareAsync();
+    const initialized: boolean = await this.pluginManager.tryInitializePluginsAsync();
+    if (!initialized) {
+      this._terminal.writeWarningLine(`To use rush plugins, you need run 'rush update' first.`);
     }
-
-    await this._initializePluginsAsync();
     await this.rushSession.hooks.initialize.promise();
 
     return await super.execute(args);
@@ -199,12 +191,6 @@ export class RushCommandLineParser extends CommandLineParser {
     if (this.telemetry) {
       this.flushTelemetry();
     }
-  }
-
-  private async _initializePluginsAsync(): Promise<void> {
-    this._pluginManager.initializeDefaultPlugins();
-
-    await this._pluginManager.initializePluginsFromConfigFileAsync();
   }
 
   private _populateActions(): void {

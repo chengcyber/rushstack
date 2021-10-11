@@ -56,6 +56,12 @@ export class UpdateAction extends BaseInstallAction {
     });
   }
 
+  protected async runAsync(): Promise<void> {
+    await this.parser.pluginManager.updateAsync();
+
+    return super.runAsync();
+  }
+
   protected buildInstallOptions(): IInstallManagerOptions {
     return {
       debug: this.parser.isDebug,
