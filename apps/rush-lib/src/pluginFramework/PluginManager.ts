@@ -1,14 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import { InternalError, ITerminal } from '@rushstack/node-core-library';
+import * as path from 'path';
+import { FileSystem, InternalError, ITerminal, JsonFile } from '@rushstack/node-core-library';
 import { CommandLineConfiguration } from '../api/CommandLineConfiguration';
 
 import { RushConfiguration } from '../api/RushConfiguration';
 import { Autoinstaller } from '../logic/Autoinstaller';
+import { RushConstants } from '../logic/RushConstants';
 import { IRushPlugin } from './IRushPlugin';
 import { PluginLoader } from './PluginLoader';
 import { RushSession } from './RushSession';
+import {
+  IPluginOptionsJsonSchemaDefinition,
+  PluginConfigJsonSchemaEditor
+} from './PluginConfigJsonSchemaEditor';
 
 export interface IPluginManagerOptions {
   terminal: ITerminal;
@@ -52,6 +58,7 @@ export class PluginManager {
     for (const pluginLoader of this._pluginLoaders) {
       pluginLoader.update();
     }
+    this._updateRushPluginsJsonSchemaFile();
   }
 
   public async _preparePluginAutoinstallersAsync(pluginLoaders: PluginLoader[]): Promise<void> {
@@ -132,5 +139,43 @@ export class PluginManager {
     } catch (e) {
       throw new InternalError(`Error applying "${pluginName}": ${e}`);
     }
+  }
+
+  private _updateRushPluginsJsonSchemaFile(): void {
+    const rushPluginsConfigJsonSchemaFilePath: string = this._getRushPluginsConfigJsonSchemaFilePath();
+    // init rush-plugins.schema.json content
+    FileSystem.copyFile({
+      sourcePath: path.join(__dirname, '../schemas/rush-plugins.schema.json'),
+      destinationPath: rushPluginsConfigJsonSchemaFilePath
+    });
+
+    const pluginOptionsJsonSchemaDefinitions: IPluginOptionsJsonSchemaDefinition[] = [];
+    for (const pluginLoader of this._pluginLoaders) {
+      const pluginOptionsSchemaJsonFilePath: string = pluginLoader.optionsSchemaJsonFilePath;
+      const definition: IPluginOptionsJsonSchemaDefinition = {
+        packageName: pluginLoader.configuration.packageName,
+        pluginName: pluginLoader.configuration.pluginName
+      };
+      if (FileSystem.exists(pluginOptionsSchemaJsonFilePath)) {
+        definition.optionsSchemaRefURI = path.relative(
+          path.dirname(rushPluginsConfigJsonSchemaFilePath),
+          pluginOptionsSchemaJsonFilePath
+        );
+      }
+      pluginOptionsJsonSchemaDefinitions.push(definition);
+    }
+    const rushPluginsConfigJsonSchemaEditor: PluginConfigJsonSchemaEditor = PluginConfigJsonSchemaEditor.load(
+      rushPluginsConfigJsonSchemaFilePath
+    );
+    rushPluginsConfigJsonSchemaEditor.setPluginOptionsSchemaDefinitions(pluginOptionsJsonSchemaDefinitions);
+    rushPluginsConfigJsonSchemaEditor.saveIfModified();
+  }
+
+  private _getRushPluginsConfigJsonSchemaFilePath(): string {
+    return path.join(
+      this._rushConfiguration.commonFolder,
+      'rush-plugins',
+      RushConstants.rushPluginsConfigJsonSchemaFilename
+    );
   }
 }

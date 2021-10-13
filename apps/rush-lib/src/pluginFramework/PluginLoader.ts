@@ -66,7 +66,7 @@ export class PluginLoader {
     const packageFolder: string = this.packageFolder;
     const manifestPath: string = path.join(packageFolder, RushConstants.rushPluginManifestFilename);
 
-    // validate
+    // rush-plugin-manifest.json
     const manifest: IRushPluginManifestJson = JsonFile.loadAndValidate(
       manifestPath,
       PluginLoader._jsonSchema
@@ -84,6 +84,7 @@ export class PluginLoader {
       throw new Error(`${pluginName} does not provided by rush plugin package ${packageName}`);
     }
 
+    // command-line.json
     const commandLineJsonFilePath: string | undefined = pluginManifest.commandLineJsonFilePath;
     if (commandLineJsonFilePath) {
       const commandLineJsonFullFilePath: string = path.join(packageFolder, commandLineJsonFilePath);
@@ -95,6 +96,21 @@ export class PluginLoader {
       FileSystem.copyFile({
         sourcePath: commandLineJsonFullFilePath,
         destinationPath: this._getCommandLineJsonFilePath()
+      });
+    }
+
+    // options Schema
+    const optionsSchema: string | undefined = pluginManifest.optionsSchema;
+    if (optionsSchema) {
+      const optionsSchemaFullFilePath: string = path.join(packageFolder, optionsSchema);
+      if (!FileSystem.exists(optionsSchemaFullFilePath)) {
+        this._terminal.writeErrorLine(
+          `Rush plugin ${pluginName} from ${packageName} specifies optionsSchema ${optionsSchema} does not exist.`
+        );
+      }
+      FileSystem.copyFile({
+        sourcePath: optionsSchemaFullFilePath,
+        destinationPath: this.optionsSchemaJsonFilePath
       });
     }
   }
@@ -144,6 +160,10 @@ export class PluginLoader {
       'node_modules',
       this._pluginConfiguration.packageName
     );
+  }
+
+  public get optionsSchemaJsonFilePath(): string {
+    return path.join(this._getPluginStorePath(), this._pluginConfiguration.pluginName, 'options.schema.json');
   }
 
   private _getRushPluginManifest(): IRushPluginManifest {
@@ -259,9 +279,11 @@ export class PluginLoader {
   }
 
   private _getPluginStorePath(): string {
+    // scope may contains @ character, which is not allowed in URI
+    const packageNameForStore: string = this._pluginConfiguration.packageName.replace(/@/g, '_');
     return path.join(
       this._rushConfiguration.rushPluginManifestsFolder,
-      this._pluginConfiguration.packageName,
+      packageNameForStore,
       this.autoinstaller.name
     );
   }

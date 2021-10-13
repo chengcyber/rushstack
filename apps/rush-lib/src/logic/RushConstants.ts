@@ -150,9 +150,14 @@ export class RushConstants {
   public static readonly rushPluginsConfigFilename: string = 'rush-plugins.json';
 
   /**
-   *
+   * Rush plugin manifest file name
    */
   public static readonly rushPluginManifestFilename: string = 'rush-plugin-manifest.json';
+
+  /**
+   * The json schema filename for rush-plugins.json
+   */
+  public static readonly rushPluginsConfigJsonSchemaFilename: string = 'rush-plugins.schema.json';
 
   /**
    * The artifactory.json configuration file name.
