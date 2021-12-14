@@ -1,8 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
+import * as fs from 'fs';
 import * as path from 'path';
-import { Import, IPackageJson, PackageJsonLookup } from '@rushstack/node-core-library';
+import { JsonFile, JsonObject, Import, IPackageJson, PackageJsonLookup, Executable } from '@rushstack/node-core-library';
+const findUp = require('find-up');
 
 const RUSH_LIB_NAME: string = '@microsoft/rush-lib';
 
@@ -63,6 +65,60 @@ if (rushLibModule === undefined) {
 // In this case, we can use install-run-rush.js to obtain the appropriate rush-lib version for the monorepo.
 //
 // NOT IMPLEMENTED YET
+if (rushLibModule === undefined) {
+  try {
+    const rushJsonPath: string | undefined = findUp.sync("rush.json", {
+      cwd: process.cwd(),
+    });
+    if (!rushJsonPath) {
+      throw new Error("Could not find rush.json");
+    }
+    const monorepoRoot: string = path.dirname(rushJsonPath);
+
+    const rushJson: JsonObject = JsonFile.load(rushJsonPath);
+    const { rushVersion } = rushJson;
+
+    const installRunNodeModuleFolder: string = path.join(
+      monorepoRoot,
+      `common/temp/install-run/@microsoft+rush@${rushVersion}`
+    );
+
+
+    try {
+      const rushLibModulePath: string = Import.resolveModule({
+        modulePath: RUSH_LIB_NAME,
+        baseFolderPath: installRunNodeModuleFolder,
+      });
+
+      rushLibModule = require(rushLibModulePath);
+    } catch (e) {
+      try {
+        // retry after install-run-rush
+        const installAndRunRushJSPath: string = path.join(
+          monorepoRoot,
+          'common/scripts/install-run-rush.js'
+        );
+        const result: JsonObject = Executable.spawnSync("node", [installAndRunRushJSPath, "--help"], {
+          stdio: 'inherit',
+        });
+        console.log('rrr', result);
+        const rushLibModulePath: string = Import.resolveModule({
+          modulePath: RUSH_LIB_NAME,
+          baseFolderPath: installRunNodeModuleFolder,
+        });
+
+        rushLibModule = require(rushLibModulePath);
+      } catch (e) {
+        throw new Error(
+          `Could not load @microsoft/rush-lib from ${installRunNodeModuleFolder}`
+        );
+      }
+    }
+  } catch (e) {
+    // no-catch
+  }
+}
+
 if (rushLibModule === undefined) {
   // This error indicates that a project is trying to import "@rushstack/rush-sdk", but the Rush engine
   // instance cannot be found.  If you are writing Jest tests for a Rush plugin, add "@microsoft/rush-lib"
