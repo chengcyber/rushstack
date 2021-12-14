@@ -1,0 +1,7 @@
+lockfileVersion: 5.3
+
+specifiers:
+  rush-my-cli-plugin: file:../../../rush-plugins/rush-my-cli-plugin
+
+dependencies:
+  rush-my-cli-plugin: link:../../../rush-plugins/rush-my-cli-plugin

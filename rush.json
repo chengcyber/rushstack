@@ -943,6 +943,12 @@
 
     // "rush-plugins" folder (alphabetical order)
     {
+      "packageName": "rush-my-cli-plugin",
+      "projectFolder": "rush-plugins/rush-my-cli-plugin",
+      "reviewCategory": "libraries",
+      "versionPolicyName": "rush"
+    },
+    {
       "packageName": "@rushstack/rush-amazon-s3-build-cache-plugin",
       "projectFolder": "rush-plugins/rush-amazon-s3-build-cache-plugin",
       "reviewCategory": "libraries",
