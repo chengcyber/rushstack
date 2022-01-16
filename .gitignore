@@ -76,7 +76,9 @@ dist
 *.sass.ts
 
 # Visual Studio Code
-.vscode
+.vscode/**
+!.vscode/launch.json
+!.vscode/tasks.json
 
 # Heft
 .heft

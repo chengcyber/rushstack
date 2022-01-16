@@ -15,11 +15,11 @@
       "allowedCategories": [ "tests" ]
     },
     {
-      "name": "@jest/create-cache-key-function",
+      "name": "@jest/core",
       "allowedCategories": [ "libraries" ]
     },
     {
-      "name": "@jest/core",
+      "name": "@jest/create-cache-key-function",
       "allowedCategories": [ "libraries" ]
     },
     {
@@ -240,6 +240,10 @@
     },
     {
       "name": "@typescript-eslint/typescript-estree",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
+      "name": "@vscode/test-electron",
       "allowedCategories": [ "libraries" ]
     },
     {
@@ -472,6 +476,10 @@
     },
     {
       "name": "minimatch",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
+      "name": "mocha",
       "allowedCategories": [ "libraries" ]
     },
     {

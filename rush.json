@@ -494,6 +494,11 @@
       "reviewCategory": "libraries",
       "versionPolicyName": "rush"
     },
+    {
+      "packageName": "rushstack-vscode-extension",
+      "projectFolder": "apps/vscode-extension",
+      "reviewCategory": "libraries"
+    },
 
     // "build-tests" folder (alphabetical order)
     {
