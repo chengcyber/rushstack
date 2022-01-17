@@ -3,12 +3,23 @@ import { terminal } from '../logic/logger';
 
 let rushTaskProvider: RushTaskProvider | undefined;
 
+export type IRushTaskDefinition = IProjectScriptTaskDefinition | IRushCommandLineTaskDefinition;
+
 export interface IProjectScriptTaskDefinition extends vscode.TaskDefinition {
   type: 'rush-project-script';
 
   cwd: string;
   command: string;
   displayName: string;
+}
+
+export interface IRushCommandLineTaskDefinition extends vscode.TaskDefinition {
+  type: 'rush-command-line';
+
+  cwd: string;
+  command: string;
+  displayName: string;
+  args: string[];
 }
 
 export class RushTaskProvider implements vscode.TaskProvider {
@@ -31,7 +42,7 @@ export class RushTaskProvider implements vscode.TaskProvider {
     return task;
   }
 
-  public async executeTask<T extends IProjectScriptTaskDefinition>(definition: T): Promise<void> {
+  public async executeTask<T extends IRushTaskDefinition>(definition: T): Promise<void> {
     let task: vscode.Task | undefined;
     switch (definition.type) {
       case 'rush-project-script': {
@@ -52,8 +63,27 @@ export class RushTaskProvider implements vscode.TaskProvider {
         );
         break;
       }
+      case 'rush-command-line': {
+        const { cwd, displayName, command, args } = definition;
+        const taskDefinition: vscode.TaskDefinition = {
+          ...definition,
+          type: 'rush',
+          cwd
+        };
+        task = new vscode.Task(
+          taskDefinition,
+          vscode.TaskScope.Workspace,
+          displayName,
+          'rush',
+          new vscode.ShellExecution(`rush ${command} ${args.join(' ')}`, {
+            cwd
+          })
+        );
+        break;
+      }
       default: {
-        terminal.writeLine(`Unknown executeTask: ${definition.type}`);
+        const _def: never = definition;
+        terminal.writeLine(`Unknown executeTask: ${(_def as unknown as { type: string }).type}`);
       }
     }
     if (task) {

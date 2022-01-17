@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { LogLevel, setLogLevel, terminal } from './logic/logger';
-import { RushWorkspace } from './logic/workspace';
+import { RushWorkspace } from './logic/RushWorkspace';
 import { RushCommandsProvider } from './providers/RushCommandsProvider';
 import { RushProjectsProvider } from './providers/RushProjectsProvider';
 import { RushTaskProvider } from './providers/TaskProvider';

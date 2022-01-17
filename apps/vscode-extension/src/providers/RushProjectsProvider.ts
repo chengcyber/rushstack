@@ -4,7 +4,7 @@ import { JsonFile, JsonObject } from '@rushstack/node-core-library';
 import { RushConfiguration, RushConfigurationProject } from '@microsoft/rush-lib';
 import { RushTaskProvider } from './TaskProvider';
 import { terminal } from '../logic/logger';
-import { RushWorkspace } from '../logic/workspace';
+import { RushWorkspace } from '../logic/RushWorkspace';
 
 interface IRushProjectParams {
   label: string;
@@ -47,7 +47,7 @@ class RushProjectScript extends vscode.TreeItem {
     scriptValue
   }: IRushProjectScriptParams) {
     super(label, collapsibleState);
-    this.contextValue = 'project-script';
+    this.contextValue = 'projectScript';
 
     this.projectFolder = projectFolder;
     this.projectRelativeFolder = projectRelativeFolder;
