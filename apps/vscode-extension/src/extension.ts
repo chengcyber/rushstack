@@ -1,24 +1,46 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { LogLevel, setLogLevel, terminal } from './logic/logger';
+import { RushWorkspace } from './logic/workspace';
+import { RushCommandsProvider } from './providers/RushCommandsProvider';
+import { RushProjectsProvider } from './providers/RushProjectsProvider';
+import { RushTaskProvider } from './providers/TaskProvider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext): void {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "vscode-hello-world" is now active!');
+  context.subscriptions.push(
+    vscode.commands.registerCommand('rushstack.selectWorkspace', async () => {
+      await RushWorkspace.selectWorkspace();
+    })
+  );
 
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  const disposable: vscode.Disposable = vscode.commands.registerCommand('rushstack.helloWorld', async () => {
-    // The code you place here will be executed every time your command is executed
-    // Display a message box to the user
-    await vscode.window.showInformationMessage('Hello World from RushStack!');
-  });
+  const extensionConfiguration: vscode.WorkspaceConfiguration =
+    vscode.workspace.getConfiguration('rushstack');
 
-  context.subscriptions.push(disposable);
+  terminal.writeLine(`Extension configuration: ${JSON.stringify(extensionConfiguration)}`);
+
+  const extensionLogLevel: LogLevel | undefined = extensionConfiguration.get('logLevel');
+  if (extensionLogLevel) {
+    setLogLevel(extensionLogLevel);
+  }
+
+  const workspaceFolderPaths: string[] = vscode.workspace.workspaceFolders?.map((x) => x.uri.fsPath) || [];
+  const rushWorkspace: RushWorkspace | undefined =
+    RushWorkspace.initializeFromWorkspaceFolderPaths(workspaceFolderPaths);
+  if (rushWorkspace) {
+    // Projects Tree View
+    vscode.window.createTreeView('rushProjects', {
+      treeDataProvider: new RushProjectsProvider(context)
+    });
+    vscode.tasks.registerTaskProvider('rushstack', RushTaskProvider.getInstance());
+
+    // Rush Commands TreeView
+    vscode.window.createTreeView('rushCommands', {
+      treeDataProvider: new RushCommandsProvider(context)
+    });
+  }
 }
 
 // this method is called when your extension is deactivated

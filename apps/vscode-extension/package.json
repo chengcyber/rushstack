@@ -20,14 +20,125 @@
   "contributes": {
     "commands": [
       {
-        "command": "rushstack.helloWorld",
-        "title": "Hello World"
+        "command": "rushstack.selectWorkspace",
+        "category": "RushStack",
+        "title": "Select workspace"
+      },
+      {
+        "command": "rushstack.rushProjects.refreshEntry",
+        "category": "RushStack",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "rushstack.rushProjects.revealInExplorer",
+        "category": "RushStack",
+        "title": "Reveal In Explorer",
+        "icon": "$(folder)"
+      },
+      {
+        "command": "rushstack.rushProjects.runProjectScript",
+        "category": "RushStack",
+        "title": "Run",
+        "icon": "$(play)"
+      }
+    ],
+    "configuration": {
+      "title": "RushStack",
+      "properties": {
+        "rushstack.logLevel": {
+          "type": "string",
+          "default": "info",
+          "enum": [
+            "info",
+            "debug"
+          ],
+          "description": "The log level to use for RushStack"
+        }
+      }
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "rushstack.rushProjects.refreshEntry",
+          "when": "view == rushProjects",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "rushstack.rushProjects.revealInExplorer",
+          "when": "view == rushProjects && viewItem == project",
+          "group": "inline"
+        },
+        {
+          "command": "rushstack.rushProjects.runProjectScript",
+          "when": "view == rushProjects && viewItem == project-script",
+          "group": "inline"
+        }
+      ]
+    },
+    "taskDefinitions": [
+      {
+        "type": "rushx",
+        "required": [
+          "cwd",
+          "command"
+        ],
+        "properties": {
+          "cwd": {
+            "type": "string",
+            "description": "The working directory for the command"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "The display name for the command"
+          },
+          "command": {
+            "type": "string",
+            "description": "The command to run"
+          }
+        }
+      }
+    ],
+    "views": {
+      "rushstack": [
+        {
+          "id": "rushProjects",
+          "name": "Projects"
+        },
+        {
+          "id": "rushCommands",
+          "name": "Rush Commands"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "rushstack",
+          "title": "RushStack",
+          "icon": "resources/rushstack.svg"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "rushProjects",
+        "contents": "In order to use RushStack, you can open a folder containing a rush.json.\n[Open Folder](command:vscode.openFolder)\nTo learn more about how to use RushStack in VS Code [read our docs](https://rushstack.io).",
+        "when": "workbenchState == empty"
       }
     ]
   },
   "activationEvents": [
-    "onCommand:rushstack.helloWorld"
+    "onStartupFinished"
   ],
+  "dependencies": {
+    "@microsoft/rush-lib": "workspace:*",
+    "@rushstack/node-core-library": "workspace:*",
+    "@rushstack/rush-sdk": "workspace:*",
+    "@rushstack/ts-command-line": "workspace:*"
+  },
   "devDependencies": {
     "@rushstack/eslint-config": "workspace:*",
     "@rushstack/heft": "workspace:*",
