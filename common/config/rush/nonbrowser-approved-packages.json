@@ -400,7 +400,7 @@
     },
     {
       "name": "html-webpack-plugin",
-      "allowedCategories": [ "tests" ]
+      "allowedCategories": [ "libraries", "tests" ]
     },
     {
       "name": "https-proxy-agent",
