@@ -350,6 +350,7 @@ importers:
       mocha: ^9.1.3
       react: ~17.0.2
       react-dom: ~17.0.2
+      react-hook-form: ~7.24.1
       typescript: ~4.5.2
     dependencies:
       '@fluentui/react': 8.49.7_3b0f326be7f6581d99777332216eb178
@@ -359,6 +360,7 @@ importers:
       '@rushstack/ts-command-line': link:../../libraries/ts-command-line
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
+      react-hook-form: 7.24.1_react@17.0.2
     devDependencies:
       '@rushstack/eslint-config': link:../../eslint/eslint-config
       '@rushstack/heft': link:../heft
@@ -16572,6 +16574,15 @@ packages:
       react-fast-compare: 3.2.0
       shallowequal: 1.1.0
     dev: true
+
+  /react-hook-form/7.24.1_react@17.0.2:
+    resolution: {integrity: sha512-UndVzKetChAsO+qkRo/6vOgaeTP60x324mHQ4iXVgHDvFjd+X/caWW0/QuAqipt8Bs7pyKH8147UQCrPTYFc2g==}
+    engines: {node: '>=12.22.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17
+    dependencies:
+      react: 17.0.2
+    dev: false
 
   /react-inspector/5.1.1_react@16.13.1:
     resolution: {integrity: sha512-GURDaYzoLbW8pMGXwYPDBIv6nqei4kK7LPRZ9q9HCZF54wqXz/dnylBp/kfE9XmekBhHvLDdcYeyIwSrvtOiWg==}

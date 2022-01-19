@@ -184,7 +184,8 @@
     "@rushstack/rush-sdk": "workspace:*",
     "@rushstack/ts-command-line": "workspace:*",
     "react": "~17.0.2",
-    "react-dom": "~17.0.2"
+    "react-dom": "~17.0.2",
+    "react-hook-form": "~7.24.1"
   },
   "devDependencies": {
     "@rushstack/eslint-config": "workspace:*",
