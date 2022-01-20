@@ -1,3 +1,4 @@
+/* eslint-env es6 */
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -22,9 +23,18 @@ function createWebpackConfig({ production }) {
       port: 8080
     },
     devtool: production ? undefined : 'source-map',
+    optimization: {
+      runtimeChunk: false,
+      splitChunks: {
+        cacheGroups: {
+          default: false
+        }
+      }
+    },
     plugins: [
       new HtmlWebpackPlugin({
-        template: 'src/webview/RunRushCommand/public/index.html'
+        template: 'src/webview/RunRushCommand/public/index.html',
+        filename: 'run-rush-command.html'
       })
     ]
   };

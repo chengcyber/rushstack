@@ -7,12 +7,28 @@
       "allowedCategories": [ "libraries" ]
     },
     {
+      "name": "@reduxjs/toolkit",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
       "name": "react",
       "allowedCategories": [ "libraries", "tests" ]
     },
     {
       "name": "react-dom",
       "allowedCategories": [ "libraries", "tests" ]
+    },
+    {
+      "name": "react-hook-form",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
+      "name": "react-redux",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
+      "name": "redux",
+      "allowedCategories": [ "libraries" ]
     }
   ]
 }

@@ -26,6 +26,7 @@ class RushCommand extends vscode.TreeItem {
 }
 
 export class RushCommandsProvider implements vscode.TreeDataProvider<RushCommand> {
+  private _context: vscode.ExtensionContext;
   private _commandLineActions: CommandLineAction[] | undefined;
   private readonly _onDidChangeTreeData: vscode.EventEmitter<RushCommand | undefined> =
     new vscode.EventEmitter();
@@ -34,6 +35,7 @@ export class RushCommandsProvider implements vscode.TreeDataProvider<RushCommand
     this._onDidChangeTreeData.event;
 
   public constructor(context: vscode.ExtensionContext) {
+    this._context = context;
     const rushWorkspace: RushWorkspace | undefined = RushWorkspace.getCurrentInstance();
     if (!rushWorkspace) {
       return;
@@ -72,7 +74,7 @@ export class RushCommandsProvider implements vscode.TreeDataProvider<RushCommand
 
   public async openParameterViewPanelAsync(element: RushCommand): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    return RushCommandWebViewPanel.getInstance().reveal();
+    return RushCommandWebViewPanel.getInstance(this._context).reveal(element.commandLineAction);
   }
 
   public async runRushCommandAsync(element?: RushCommand): Promise<void> {

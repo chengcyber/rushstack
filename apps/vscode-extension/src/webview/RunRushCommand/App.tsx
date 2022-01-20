@@ -1,4 +1,6 @@
 import { Stack, DefaultPalette, IStackStyles, IStackTokens, initializeIcons } from '@fluentui/react'
+import { useEffect } from 'react';
+import { fromExtensionListener } from './Message/fromExtension';
 import { ParameterView } from './ParameterView';
 import { Toolbar } from './Toolbar';
 
@@ -18,6 +20,14 @@ const verticalGapStackTokens: IStackTokens = {
 };
 
 export const App = (): JSX.Element => {
+
+  useEffect(() => {
+    window.addEventListener('message', fromExtensionListener);
+    return () => {
+      window.removeEventListener('message', fromExtensionListener);
+    }
+  }, [])
+
   return <Stack styles={stackStyles} tokens={verticalGapStackTokens}>
     <Stack.Item>
       <Toolbar />
