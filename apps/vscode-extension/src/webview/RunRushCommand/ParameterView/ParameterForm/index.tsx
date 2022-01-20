@@ -1,20 +1,24 @@
-import { CommandLineChoiceListParameter, CommandLineChoiceParameter, CommandLineFlagParameter, CommandLineParameter, CommandLineParameterKind } from "@rushstack/ts-command-line";
+import { CommandLineChoiceListParameter, CommandLineChoiceParameter, CommandLineFlagParameter, CommandLineParameterKind } from "@rushstack/ts-command-line";
 import { useForm } from "react-hook-form";
-import { ControlledTextField } from "../ControlledFormComponents/ControlledTextField";
-import { useAppSelector } from "../store/hooks";
+import { ControlledTextField } from "../../ControlledFormComponents/ControlledTextField";
+import { useAppSelector } from "../../store/hooks";
+import { ControlledComboBox } from "../../ControlledFormComponents/ControlledComboBox";
 
 import type { ReactNode } from "react";
-import { ControlledComboBox } from "../ControlledFormComponents/ControlledComboBox";
+import type { ICommandLineParameter } from "../../Message/fromExtension";
+import { ParameterFormWatcher } from "./Watcher";
 
 export const ParameterForm = (): JSX.Element => {
-  const { control } = useForm();
+  const { control, watch } = useForm();
 
-  const parameters: CommandLineParameter[] = useAppSelector(state => state.parameter.parameters);
+  const parameters: ICommandLineParameter[] = useAppSelector(state => state.parameter.parameters);
+
+  console.log('wwwwwwww', watch());
 
   return (
     <div>
       {
-        parameters.map((parameter: CommandLineParameter) => {
+        parameters.map((parameter: ICommandLineParameter) => {
           let fieldNode: ReactNode = null;
           switch (parameter.kind) {
             case CommandLineParameterKind.Choice: {
@@ -88,7 +92,7 @@ export const ParameterForm = (): JSX.Element => {
               fieldNode = (
                 <ControlledTextField
                   type="string"
-                  name={parameter.longName}
+                  name={parameter.longName.slice(2)}
                   control={control}
                 />
               )
@@ -105,16 +109,17 @@ export const ParameterForm = (): JSX.Element => {
           }
 
           return (
-            <>
+            <div key={parameter.longName}>
               <h3 id={parameter.longName}>
                 {parameter.longName}
               </h3>
               {parameter.description ? <p>{parameter.description}</p> : null}
               {fieldNode}
-            </>
+            </div>
           )
         })
       }
+      <ParameterFormWatcher watch={watch} />
     </div>
   )
 }

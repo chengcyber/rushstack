@@ -13,16 +13,18 @@ export const ControlledTextField = (props: IControlledTextFieldProps): JSX.Eleme
       control={control}
       rules={rules}
       defaultValue={defaultValue}
-      render={({ field: { onChange, value, onBlur, name: fieldName }, fieldState: { error } }) => (
-        <TextField
-          {...props}
-          onChange={onChange}
-          value={value}
-          onBlur={onBlur}
-          name={fieldName}
-          errorMessage={error && error.message}
-        />
-      )}
+      render={({ field: { onChange, value, onBlur, name: fieldName }, fieldState: { error } }) => {
+        return (
+          <TextField
+            {...props}
+            onChange={onChange}
+            value={value}
+            onBlur={onBlur}
+            name={fieldName}
+            errorMessage={error && error.message}
+          />
+        )
+      }}
     />
   );
 };

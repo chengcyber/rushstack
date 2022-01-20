@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { FileSystem } from '@rushstack/node-core-library';
 
-import type { CommandLineAction } from '@rushstack/ts-command-line';
-import type { IFromExtensionMessage } from '../webview/RunRushCommand/Message/fromExtension';
+import type { CommandLineAction, CommandLineParameter } from '@rushstack/ts-command-line';
+import type { ICommandLineParameter, IFromExtensionMessage } from '../webview/RunRushCommand/Message/fromExtension';
 import type { IRootState } from '../webview/RunRushCommand/store';
 
 export class RushCommandWebViewPanel {
@@ -25,7 +25,15 @@ export class RushCommandWebViewPanel {
   public reveal(commandLineAction: CommandLineAction): void {
     const state: IRootState = {
       parameter: {
-        parameters: commandLineAction.parameters.slice()
+        parameters: commandLineAction.parameters.slice().map((parameter: CommandLineParameter) => {
+          const o: ICommandLineParameter =  {
+            ...parameter,
+            // kind is a getter in CommandLineParameter
+            kind: parameter.kind,
+          }
+          return o;
+        }),
+        args: [],
       }
     };
     if (!this._panel) {

@@ -1,13 +1,21 @@
 import { store } from '../store';
 import { initializeParameters } from '../store/slices/parameter';
 
-import type { CommandLineParameter } from '@rushstack/ts-command-line';
+import type { CommandLineParameterKind } from '@rushstack/ts-command-line';
+
+export interface ICommandLineParameter {
+  readonly kind: CommandLineParameterKind
+  readonly longName: string;
+  readonly shortName: string | undefined;
+  readonly description: string;
+  readonly required: boolean;
+}
 
 export type IFromExtensionMessage = IFromExtensionMessageInitialize;
 
 interface IFromExtensionMessageInitialize {
   command: 'initialize';
-  parameters: CommandLineParameter[];
+  parameters: ICommandLineParameter[];
 }
 
 export const fromExtensionListener: (event: MessageEvent<IFromExtensionMessage>) => void = (
