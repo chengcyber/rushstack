@@ -1,27 +1,51 @@
-import { IStackStyles, DefaultPalette, Stack } from "@fluentui/react";
-import { useAppSelector } from "../store/hooks";
+import { IStackStyles, DefaultPalette, Stack, IStackItemStyles } from '@fluentui/react';
+import { useMemo } from 'react';
+import { useParameterArgs } from '../store/slices/parameter';
 
 const stackStyles: IStackStyles = {
   root: {
-    background: DefaultPalette.themeTertiary,
-  },
+    minWidth: 0,
+    background: DefaultPalette.themeTertiary
+  }
+};
+
+const stackItemStyles: IStackItemStyles = {
+  root: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  }
 };
 
 export const ParameterDisplay = (): JSX.Element => {
-  const args: (string | [string, string])[] = useAppSelector(state => state.parameter.args);
+  const args: string[] = useParameterArgs();
+  const argsTextList: string[] = useMemo(() => {
+    const ret: string[] = [];
+    for (let i: number = 0; i < args.length; i++) {
+      const currentArg: string = args[i];
+      let nextArg: string | undefined;
+      if (i + 1 < args.length) {
+        nextArg = args[i + 1];
+      }
+      if (!nextArg || nextArg?.startsWith('--')) {
+        ret.push(currentArg);
+      } else {
+        ret.push(`${currentArg} ${nextArg}`);
+        i++;
+      }
+    }
+    return ret;
+  }, [args]);
   return (
     <Stack styles={stackStyles}>
-      {
-        args.map((arg: string | [string, string]) => {
-          let text: string = '';
-          if (Array.isArray(arg)) {
-            text = `${arg[0]} ${arg[1]}`
-          } else {
-            text = arg
-          }
-          return <span key={text}>{text}</span>
-        })
-      }
+      {argsTextList.map((text: string) => {
+        return (
+          <Stack.Item styles={stackItemStyles} key={text}>
+            <span title={text} style={{ whiteSpace: 'nowrap' }}>
+              {text}
+            </span>
+          </Stack.Item>
+        );
+      })}
     </Stack>
-  )
-}
+  );
+};

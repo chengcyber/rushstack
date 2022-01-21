@@ -27,7 +27,10 @@ export class RushWorkspace {
     RushWorkspace._onDidChangeWorkspace.fire(this);
   }
 
-  public static getCurrentInstance(): RushWorkspace | undefined {
+  public static getCurrentInstance(): RushWorkspace {
+    if (!RushWorkspace._rushWorkspace) {
+      throw new Error('RushWorkspace not initialized');
+    }
     return RushWorkspace._rushWorkspace;
   }
 

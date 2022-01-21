@@ -1,26 +1,27 @@
-import { Label } from "@fluentui/react";
-import { useAppSelector } from "../store/hooks";
+import { Label } from '@fluentui/react';
 
-import type { CSSProperties } from "react";
-import type { ICommandLineParameter } from "../Message/fromExtension";
+import type { CSSProperties } from 'react';
+import { ICommandLineParameter, useSearchedParameters } from '../store/slices/parameter';
 
 const navStyle: CSSProperties = {
   width: '140px',
   height: 'auto',
   boxSizing: 'border-box',
-  overflowY: 'auto',
+  overflowY: 'auto'
 };
 
 export const ParameterNav = (): JSX.Element => {
-  const parameters: ICommandLineParameter[] = useAppSelector(state => state.parameter.parameters)
+  const parameters: ICommandLineParameter[] = useSearchedParameters();
   return (
     <div style={navStyle}>
-      {
-        parameters.map((parameter: ICommandLineParameter) => {
-          const text: string = parameter.longName;
-          return <Label key={text} required={parameter.required}>{text}</Label>
-        })
-      }
+      {parameters.map((parameter: ICommandLineParameter) => {
+        const text: string = parameter.longName;
+        return (
+          <Label key={text} required={parameter.required}>
+            {text}
+          </Label>
+        );
+      })}
     </div>
-  )
-}
+  );
+};

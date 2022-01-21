@@ -70,10 +70,7 @@ export class RushProjectsProvider implements vscode.TreeDataProvider<RushProject
     this._onDidChangeTreeData.event;
 
   public constructor(context: vscode.ExtensionContext) {
-    const rushWorkspace: RushWorkspace | undefined = RushWorkspace.getCurrentInstance();
-    if (!rushWorkspace) {
-      return;
-    }
+    const rushWorkspace: RushWorkspace = RushWorkspace.getCurrentInstance();
     RushWorkspace.onDidChangeWorkspace((rushWorkspace: RushWorkspace) => {
       this._rushConfiguration = rushWorkspace.rushConfiguration;
       this.refresh();

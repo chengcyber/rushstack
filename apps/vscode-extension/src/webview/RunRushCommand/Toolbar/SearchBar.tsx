@@ -1,8 +1,19 @@
-import { SearchBox } from "@fluentui/react";
+import { SearchBox } from '@fluentui/react';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 
+import type { AnyAction, Dispatch } from '@reduxjs/toolkit';
+import { onChangeSearchText } from '../store/slices/parameter';
 
 export const SearchBar = (): JSX.Element => {
+  const searchText: string = useAppSelector((state) => state.parameter.searchText);
+  const dispatch: Dispatch<AnyAction> = useAppDispatch();
   return (
-    <SearchBox placeholder="Search Parameter" onSearch={newValue => console.log('value is ' + newValue)} />
-  )
-}
+    <SearchBox
+      placeholder="Search Parameter"
+      value={searchText}
+      onChange={(e, newValue) => {
+        dispatch(onChangeSearchText(newValue));
+      }}
+    />
+  );
+};

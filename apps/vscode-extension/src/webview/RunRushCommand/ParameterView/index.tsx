@@ -1,14 +1,14 @@
-import { IStackStyles, DefaultPalette, IStackItemStyles, IStackTokens, Stack } from "@fluentui/react";
-import { ParameterDisplay } from "./ParameterDisplay";
-import { ParameterForm } from "./ParameterForm";
-import { ParameterNav } from "./ParameterNav";
+import { IStackStyles, DefaultPalette, IStackItemStyles, IStackTokens, Stack } from '@fluentui/react';
+import { ParameterDisplay } from './ParameterDisplay';
+import { ParameterForm } from './ParameterForm';
+import { ParameterNav } from './ParameterNav';
 
 // Styles definition
 const stackStyles: IStackStyles = {
   root: {
     background: DefaultPalette.themeTertiary,
-    height: '100%',
-  },
+    height: '100%'
+  }
 };
 const stackItemStyles: IStackItemStyles = {
   root: {
@@ -18,13 +18,14 @@ const stackItemStyles: IStackItemStyles = {
     display: 'flex',
     height: '100%',
     justifyContent: 'flex-start',
-  },
+    minWidth: 0
+  }
 };
 
 // Tokens definition
 const stackTokens: IStackTokens = {
   childrenGap: 5,
-  padding: 10,
+  padding: 10
 };
 
 export const ParameterView = (): JSX.Element => {
@@ -33,12 +34,12 @@ export const ParameterView = (): JSX.Element => {
       <Stack.Item align="auto" styles={stackItemStyles}>
         <ParameterNav />
       </Stack.Item>
-      <Stack.Item grow={5} align="auto" styles={stackItemStyles}>
+      <Stack.Item align="auto" styles={stackItemStyles}>
         <ParameterForm />
       </Stack.Item>
-      <Stack.Item grow={3} align="auto" styles={stackItemStyles}>
+      <Stack.Item grow={1} align="auto" styles={stackItemStyles}>
         <ParameterDisplay />
       </Stack.Item>
     </Stack>
-  )
-}
+  );
+};

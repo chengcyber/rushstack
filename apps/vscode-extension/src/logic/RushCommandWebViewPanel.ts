@@ -2,9 +2,14 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { FileSystem } from '@rushstack/node-core-library';
 
+import { RushTaskProvider } from '../providers/TaskProvider';
+import { RushWorkspace } from './RushWorkspace';
+
 import type { CommandLineAction, CommandLineParameter } from '@rushstack/ts-command-line';
-import type { ICommandLineParameter, IFromExtensionMessage } from '../webview/RunRushCommand/Message/fromExtension';
+import type { IFromExtensionMessage } from '../webview/RunRushCommand/Message/fromExtension';
 import type { IRootState } from '../webview/RunRushCommand/store';
+import type { IToExtensionMessage } from '../webview/RunRushCommand/Message/toExtension';
+import type { ICommandLineParameter } from '../webview/RunRushCommand/store/slices/parameter';
 
 export class RushCommandWebViewPanel {
   private static _instance: RushCommandWebViewPanel | undefined;
@@ -25,15 +30,17 @@ export class RushCommandWebViewPanel {
   public reveal(commandLineAction: CommandLineAction): void {
     const state: IRootState = {
       parameter: {
+        commandName: commandLineAction.actionName,
         parameters: commandLineAction.parameters.slice().map((parameter: CommandLineParameter) => {
-          const o: ICommandLineParameter =  {
+          const o: ICommandLineParameter = {
             ...parameter,
             // kind is a getter in CommandLineParameter
-            kind: parameter.kind,
-          }
+            kind: parameter.kind
+          };
           return o;
         }),
-        args: [],
+        argsKV: {},
+        searchText: ''
       }
     };
     if (!this._panel) {
@@ -50,10 +57,33 @@ export class RushCommandWebViewPanel {
         this._panel = undefined;
       });
       this._setWebviewContent(state);
+      this._panel.webview.onDidReceiveMessage((message: IToExtensionMessage) => {
+        switch (message.command) {
+          case 'commandInfo': {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            RushTaskProvider.getInstance().executeTask({
+              type: 'rush-command-line',
+              displayName: `rush ${message.commandName}`,
+              cwd: RushWorkspace.getCurrentInstance().workspaceRootPath,
+              command: message.commandName,
+              args: message.args
+            });
+            break;
+          }
+          default: {
+            const _command: never = message.command;
+            console.error(`Unknown command: ${_command}`);
+            break;
+          }
+        }
+      });
     } else {
       const message: IFromExtensionMessage = {
         command: 'initialize',
-        parameters: state.parameter.parameters
+        state: {
+          ...state.parameter,
+          parameters: state.parameter.parameters
+        }
       };
       console.log('message', message);
       this._panel.reveal();

@@ -1,4 +1,4 @@
-import { ComboBox, IComboBoxProps } from '@fluentui/react';
+import { ComboBox, IComboBoxOption, IComboBoxProps } from '@fluentui/react';
 import { Controller } from 'react-hook-form';
 
 import type { IHookFormProps } from './interface';
@@ -13,18 +13,28 @@ export const ControlledComboBox = (props: IControlledComboBoxProps): JSX.Element
       control={control}
       rules={rules}
       defaultValue={defaultValue}
-      render={({ field: { onChange, value, onBlur, name: fieldName }, fieldState: { error } }) => (
-        <>
-          <ComboBox
-            {...props}
-            onChange={onChange}
-            selectedKey={value}
-            onBlur={onBlur}
-            id={fieldName}
-            errorMessage={error && error.message}
-          />
-        </>
-      )}
+      render={({ field: { onChange, value, onBlur, name: fieldName }, fieldState: { error } }) => {
+        const onChangeComboBox: IComboBoxProps['onChange'] = (
+          e: unknown,
+          option: IComboBoxOption | undefined
+        ) => {
+          if (option) {
+            onChange(option.key);
+          }
+        };
+        return (
+          <>
+            <ComboBox
+              {...props}
+              onChange={onChangeComboBox}
+              selectedKey={value}
+              onBlur={onBlur}
+              id={fieldName}
+              errorMessage={error && error.message}
+            />
+          </>
+        );
+      }}
     />
   );
 };
