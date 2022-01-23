@@ -1,28 +1,39 @@
-import { DefaultPalette, IStackItemStyles, IStackStyles, IStackTokens, Stack } from "@fluentui/react"
-import { RunButton } from "./RunButton";
-import { SearchBar } from "./SearchBar";
+import { IStackItemStyles, IStackStyles, IStackTokens, IStyle, Stack } from '@fluentui/react';
+import { CSSProperties } from 'react';
+import { useStickyToolbar } from '../hooks/parametersFormScroll';
+import { RunButton } from './RunButton';
+import { SearchBar } from './SearchBar';
 
 // Styles definition
 const stackStyles: IStackStyles = {
   root: {
-    background: DefaultPalette.themeTertiary,
-  },
+    // background: DefaultPalette.themeTertiary,
+    transition: 'box-shadow ease-in-out 0.1s'
+  }
 };
 
 const stackItemStyles: IStackItemStyles = {
   root: {
-    background: DefaultPalette.themePrimary,
-    color: DefaultPalette.white,
-    padding: 5,
-  },
+    // background: DefaultPalette.themePrimary,
+    // color: DefaultPalette.white,
+  }
 };
 
 const horizontalGapStackTokens: IStackTokens = {
   childrenGap: 10,
-  padding: 10,
+  padding: 10
 };
 
 export const Toolbar = (): JSX.Element => {
+  const { isSticky } = useStickyToolbar();
+  if (isSticky) {
+    stackStyles.root = {
+      ...(stackStyles.root as CSSProperties),
+      boxShadow: 'rgb(17 17 26 / 10%) 0px 4px 16px, rgb(17 17 26 / 5%) 0px 8px 32px'
+    } as IStyle;
+  } else {
+    (stackStyles.root as CSSProperties).boxShadow = 'none';
+  }
   return (
     <Stack horizontal disableShrink styles={stackStyles} tokens={horizontalGapStackTokens}>
       <Stack.Item align="center" grow styles={stackItemStyles}>
@@ -32,5 +43,5 @@ export const Toolbar = (): JSX.Element => {
         <RunButton />
       </Stack.Item>
     </Stack>
-  )
-}
+  );
+};

@@ -1,7 +1,14 @@
 import { Label } from '@fluentui/react';
+import { AnyAction, Dispatch } from '@reduxjs/toolkit';
 
-import type { CSSProperties } from 'react';
-import { ICommandLineParameter, useSearchedParameters } from '../store/slices/parameter';
+import { CSSProperties, useEffect } from 'react';
+import { useAppDispatch } from '../store/hooks';
+import { ICommandLineParameter, useFilteredParameters } from '../store/slices/parameter';
+import {
+  setUserSelectedParameterName,
+  useCurrentParameterName,
+  useUserSelectedParameterName
+} from '../store/slices/ui';
 
 const navStyle: CSSProperties = {
   width: '140px',
@@ -10,14 +17,57 @@ const navStyle: CSSProperties = {
   overflowY: 'auto'
 };
 
+const NAV_LABEL_PREFIX: string = 'parameter-nav-label-';
+
 export const ParameterNav = (): JSX.Element => {
-  const parameters: ICommandLineParameter[] = useSearchedParameters();
+  const parameters: ICommandLineParameter[] = useFilteredParameters();
+  const currentParameterName: string = useCurrentParameterName();
+  const userSelectdParameterName: string = useUserSelectedParameterName();
+  const dispatch: Dispatch<AnyAction> = useAppDispatch();
+
+  useEffect(() => {
+    const $el: HTMLElement | null = document.getElementById(`${NAV_LABEL_PREFIX}${currentParameterName}`);
+    if ($el) {
+      $el.scrollIntoView({
+        block: 'nearest',
+        inline: 'nearest'
+      });
+    }
+  }, [currentParameterName]);
+
   return (
     <div style={navStyle}>
       {parameters.map((parameter: ICommandLineParameter) => {
-        const text: string = parameter.longName;
+        const { longName } = parameter;
+        const text: string = longName
+          .replace(/^--([a-z])/, (matches) => {
+            return matches[2].toUpperCase();
+          })
+          .replace(/-([a-z])/g, (matches) => {
+            return matches[1].toUpperCase();
+          });
+        let fontWeight: string = 'normal';
+        if (userSelectdParameterName) {
+          if (userSelectdParameterName === longName) {
+            fontWeight = 'bold';
+          }
+        } else if (currentParameterName === longName) {
+          fontWeight = 'bold';
+        }
         return (
-          <Label key={text} required={parameter.required}>
+          <Label
+            id={`${NAV_LABEL_PREFIX}${longName}`}
+            styles={{
+              root: {
+                fontWeight
+              }
+            }}
+            key={text}
+            required={parameter.required}
+            onClick={() => {
+              dispatch(setUserSelectedParameterName(longName));
+            }}
+          >
             {text}
           </Label>
         );

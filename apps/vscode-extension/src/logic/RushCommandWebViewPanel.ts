@@ -28,19 +28,27 @@ export class RushCommandWebViewPanel {
   }
 
   public reveal(commandLineAction: CommandLineAction): void {
+    const parameters: ICommandLineParameter[] = commandLineAction.parameters
+      .slice()
+      .map((parameter: CommandLineParameter) => {
+        const o: ICommandLineParameter = {
+          ...parameter,
+          // kind is a getter in CommandLineParameter
+          kind: parameter.kind
+        };
+        return o;
+      });
     const state: IRootState = {
       parameter: {
         commandName: commandLineAction.actionName,
-        parameters: commandLineAction.parameters.slice().map((parameter: CommandLineParameter) => {
-          const o: ICommandLineParameter = {
-            ...parameter,
-            // kind is a getter in CommandLineParameter
-            kind: parameter.kind
-          };
-          return o;
-        }),
+        parameters,
         argsKV: {},
         searchText: ''
+      },
+      ui: {
+        isToolbarSticky: false,
+        currentParameterName: parameters[0]?.longName || '',
+        userSelectedParameterName: ''
       }
     };
     if (!this._panel) {

@@ -1,4 +1,4 @@
-import { CSSProperties, MutableRefObject, ReactNode, useEffect, useMemo, useRef } from 'react';
+import { CSSProperties, MutableRefObject, ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   CommandLineChoiceListParameter,
   CommandLineChoiceParameter,
@@ -6,7 +6,7 @@ import {
   CommandLineIntegerParameter,
   CommandLineParameterKind
 } from '@rushstack/ts-command-line';
-import { FieldValues, useForm } from 'react-hook-form';
+import { FieldValues, Resolver, UseControllerProps, useForm, UseFormReturn } from 'react-hook-form';
 import { Label } from '@fluentui/react';
 
 import { ControlledTextField } from '../../ControlledFormComponents/ControlledTextField';
@@ -15,20 +15,27 @@ import { ControlledTextFieldArray } from '../../ControlledFormComponents/Control
 import {
   ICommandLineParameter,
   onChangeFormDefaultValues,
-  useSearchedParameters
+  useArgsTextList,
+  useFilteredParameters
 } from '../../store/slices/parameter';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { ParameterFormWatcher } from './Watcher';
 
 import type { AnyAction, Dispatch } from '@reduxjs/toolkit';
+import { ControlledToggle } from '../../ControlledFormComponents/ControlledToggle';
+import { FIELD_ANCHOR_CLASSNAME } from '../../hooks/parametersFormScroll';
+import { setFormValidateAsync, useUserSelectedParameterName } from '../../store/slices/ui';
 
 const formStyle: CSSProperties = {
-  width: '430px'
+  // width: '430px'
 };
 
 export const ParameterForm = (): JSX.Element => {
   const commandName: string = useAppSelector((state) => state.parameter.commandName);
-  const parameters: ICommandLineParameter[] = useSearchedParameters();
+  const parameters: ICommandLineParameter[] = useFilteredParameters();
+  const argsTextList: string[] = useArgsTextList();
+  const dispatch: Dispatch<AnyAction> = useAppDispatch();
+  const userSelectdParameterName: string = useUserSelectedParameterName();
 
   const defaultValues: FieldValues = useMemo(() => {
     return parameters.reduce((acc: FieldValues, parameter: ICommandLineParameter) => {
@@ -42,11 +49,27 @@ export const ParameterForm = (): JSX.Element => {
     }, {});
   }, [commandName, parameters]);
 
-  const { control, watch, reset } = useForm({
-    defaultValues
-  });
+  const resolverRef: MutableRefObject<Resolver | undefined> = useRef(undefined);
 
-  const dispatch: Dispatch<AnyAction> = useAppDispatch();
+  const form: UseFormReturn = useForm({
+    defaultValues,
+    resolver: async (...args) => {
+      if (resolverRef.current) {
+        return await resolverRef.current(...args);
+      }
+      return { values: {}, errors: {} };
+    },
+    shouldFocusError: true
+  });
+  useEffect(() => {
+    dispatch(
+      setFormValidateAsync(() => {
+        return form.trigger();
+      })
+    );
+  }, [form]);
+  const { control, watch, reset, getValues } = form;
+
   const defaultValuesRef: MutableRefObject<FieldValues> = useRef<FieldValues>({});
   useEffect(() => {
     // deep clone
@@ -58,28 +81,71 @@ export const ParameterForm = (): JSX.Element => {
   useEffect(() => {
     const defaultValues: FieldValues = defaultValuesRef.current;
     reset(defaultValues);
-    console.log('rest', defaultValues);
     dispatch(onChangeFormDefaultValues(defaultValues));
   }, [commandName, reset]);
 
-  // const fieldValues: FieldValues = watch();
-  // useEffect(() => {
-  //   dispatch(onChangeFormValues(fieldValues));
-  // }, [fieldValues])
+  useEffect(() => {
+    if (!userSelectdParameterName) {
+      return;
+    }
+    const $el: HTMLElement | null = document.getElementById(userSelectdParameterName);
+    if ($el) {
+      $el.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'start'
+      });
+    }
+  }, [userSelectdParameterName]);
 
   return (
     <div style={formStyle}>
-      <h3>{commandName}</h3>
+      <h3>
+        rush {commandName} {argsTextList.join(' ')}
+      </h3>
       {parameters.map((parameter: ICommandLineParameter) => {
         let fieldNode: ReactNode = null;
+        const baseControllerProps: Pick<Required<UseControllerProps>, 'name' | 'control'> &
+          UseControllerProps = {
+          name: parameter.longName,
+          control
+        };
+        if (parameter.required) {
+          baseControllerProps.rules = {
+            validate: () => {
+              const v: undefined | Array<{ value: string | number }> | string | number | boolean = getValues(
+                parameter.longName
+              );
+
+              console.log('validating', v, parameter.longName);
+
+              if (typeof v === 'undefined') {
+                return 'This field is required';
+              } else if (Array.isArray(v)) {
+                console.log('validating array', v);
+                if (
+                  !v.some((item) => {
+                    return Boolean(String(item.value));
+                  })
+                ) {
+                  return 'This field requires at least one valid value';
+                }
+              } else {
+                if (!String(v)) {
+                  return 'This field is required';
+                }
+              }
+            }
+          };
+        }
+
         switch (parameter.kind) {
           case CommandLineParameterKind.Choice: {
             const commandLineChoiceParameter: CommandLineChoiceParameter =
               parameter as CommandLineChoiceParameter;
             fieldNode = (
               <ControlledComboBox
-                name={commandLineChoiceParameter.longName}
-                control={control}
+                {...baseControllerProps}
                 defaultValue={commandLineChoiceParameter.defaultValue}
                 options={commandLineChoiceParameter.alternatives.map((alternative: string) => ({
                   key: alternative,
@@ -94,9 +160,8 @@ export const ParameterForm = (): JSX.Element => {
               parameter as CommandLineChoiceListParameter;
             fieldNode = (
               <ControlledComboBox
+                {...baseControllerProps}
                 multiSelect={true}
-                name={commandLineChoiceListParameter.longName}
-                control={control}
                 options={commandLineChoiceListParameter.alternatives.map((alternative: string) => ({
                   key: alternative,
                   text: alternative
@@ -106,28 +171,8 @@ export const ParameterForm = (): JSX.Element => {
             break;
           }
           case CommandLineParameterKind.Flag: {
-            const commandLineFlagParameter: CommandLineFlagParameter = parameter as CommandLineFlagParameter;
-            fieldNode = (
-              <ControlledComboBox
-                multiSelect={true}
-                name={commandLineFlagParameter.longName}
-                control={control}
-                options={[
-                  {
-                    key: '',
-                    text: ''
-                  },
-                  {
-                    key: 'true',
-                    text: 'true'
-                  },
-                  {
-                    key: 'false',
-                    text: 'false'
-                  }
-                ]}
-              />
-            );
+            // const commandLineFlagParameter: CommandLineFlagParameter = parameter as CommandLineFlagParameter;
+            fieldNode = <ControlledToggle {...baseControllerProps} />;
             break;
           }
           case CommandLineParameterKind.Integer: {
@@ -135,27 +180,34 @@ export const ParameterForm = (): JSX.Element => {
               parameter as CommandLineIntegerParameter;
             fieldNode = (
               <ControlledTextField
+                {...baseControllerProps}
                 type="number"
                 defaultValue={String(commandLineIntegerParameter.defaultValue)}
-                name={commandLineIntegerParameter.longName}
-                control={control}
               />
             );
             break;
           }
           case CommandLineParameterKind.IntegerList: {
             fieldNode = (
-              <ControlledTextFieldArray type="number" name={parameter.longName} control={control} />
+              <ControlledTextFieldArray
+                {...baseControllerProps}
+                arrayRules={baseControllerProps.rules}
+                type="number"
+              />
             );
             break;
           }
           case CommandLineParameterKind.String: {
-            fieldNode = <ControlledTextField type="string" name={parameter.longName} control={control} />;
+            fieldNode = <ControlledTextField {...baseControllerProps} type="string" />;
             break;
           }
           case CommandLineParameterKind.StringList: {
             fieldNode = (
-              <ControlledTextFieldArray type="string" name={parameter.longName} control={control} />
+              <ControlledTextFieldArray
+                {...baseControllerProps}
+                arrayRules={baseControllerProps.rules}
+                type="string"
+              />
             );
             break;
           }
@@ -168,7 +220,7 @@ export const ParameterForm = (): JSX.Element => {
 
         return (
           <div key={parameter.longName}>
-            <Label id={parameter.longName} required={parameter.required}>
+            <Label id={parameter.longName} className={FIELD_ANCHOR_CLASSNAME} required={parameter.required}>
               {parameter.longName}
             </Label>
             {parameter.description ? <p>{parameter.description}</p> : null}

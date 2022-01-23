@@ -4,7 +4,6 @@ import { useAppSelector } from '../hooks';
 
 import type { FieldValues } from 'react-hook-form';
 import type { CommandLineParameterKind } from '@rushstack/ts-command-line';
-import { store } from '..';
 
 export interface ICommandLineParameter {
   readonly kind: CommandLineParameterKind;
@@ -34,7 +33,6 @@ export const parameterSlice: Slice<IParameterState, SliceCaseReducers<IParameter
     initialState,
     reducers: {
       initializeParameters: (state, action: PayloadAction<IParameterState>) => {
-        console.log('aaaa', action.payload);
         Object.assign(state, action.payload);
       },
       onChangeFormDefaultValues: (state, action: PayloadAction<FieldValues>) => {
@@ -79,6 +77,8 @@ function patchStateByFormValues(state: IParameterState, fieldValues: FieldValues
         .filter(Boolean);
       if (filteredValue.length) {
         state.argsKV[key] = filteredValue;
+      } else {
+        state.argsKV[key] = [];
       }
     } else {
       state.argsKV[key] = value;
@@ -131,12 +131,31 @@ export const useParameters: () => ICommandLineParameter[] = () => {
   }, isParametersEqual);
 };
 
-export const useSearchedParameters: () => ICommandLineParameter[] = () => {
+export const useFilteredParameters: () => ICommandLineParameter[] = () => {
   const parameters: ICommandLineParameter[] = useParameters();
   const searchText: string = useAppSelector((state) => state.parameter.searchText);
   return parameters.filter((parameter) => {
     return parameter.longName.includes(searchText) || parameter.description.includes(searchText);
   });
+};
+
+export const useArgsTextList = (): string[] => {
+  const args: string[] = useParameterArgs();
+  const argsTextList: string[] = [];
+  for (let i: number = 0; i < args.length; i++) {
+    const currentArg: string = args[i];
+    let nextArg: string | undefined;
+    if (i + 1 < args.length) {
+      nextArg = args[i + 1];
+    }
+    if (!nextArg || nextArg?.startsWith('--')) {
+      argsTextList.push(currentArg);
+    } else {
+      argsTextList.push(`${currentArg} ${nextArg}`);
+      i++;
+    }
+  }
+  return argsTextList;
 };
 
 export default parameterSlice.reducer;

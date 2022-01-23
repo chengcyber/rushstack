@@ -7,16 +7,24 @@ import { useParameterArgs } from '../store/slices/parameter';
 
 export const RunButton = (): JSX.Element => {
   const commandName: string = useAppSelector((state) => state.parameter.commandName);
+  const formValidateAsync: (() => Promise<boolean>) | undefined = useAppSelector(
+    (state) => state.ui.formValidateAsync
+  );
   const args: string[] = useParameterArgs();
-  const onClickRunButton: () => void = useCallback(() => {
-    if (!commandName) {
+  const onClickRunButton: () => void = useCallback(async () => {
+    console.log('onCLickRun', commandName, formValidateAsync);
+    if (!commandName || !formValidateAsync) {
       return;
     }
-    sendMessageToExtension({
-      command: 'commandInfo',
-      commandName,
-      args
-    });
-  }, [args, commandName]);
-  return <PrimaryButton text="RUN" onClick={onClickRunButton} allowDisabledFocus />;
+    const isValid: boolean = await formValidateAsync();
+    console.log('isValid', isValid);
+    if (isValid) {
+      sendMessageToExtension({
+        command: 'commandInfo',
+        commandName,
+        args
+      });
+    }
+  }, [args, commandName, formValidateAsync]);
+  return <PrimaryButton text="Run" onClick={onClickRunButton} allowDisabledFocus />;
 };

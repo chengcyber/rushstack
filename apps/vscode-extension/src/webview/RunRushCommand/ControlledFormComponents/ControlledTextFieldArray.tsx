@@ -1,12 +1,16 @@
 import { IconButton, ITextFieldProps, Stack, TextField } from '@fluentui/react';
-import { Controller, useFieldArray } from 'react-hook-form';
+import { Controller, RegisterOptions, useFieldArray } from 'react-hook-form';
+import { ErrorMessage } from './ErrorMessage';
 
 import type { IHookFormProps } from './interface';
 
-export type IControlledTextFieldArrayProps = ITextFieldProps & IHookFormProps<string>;
+export type IControlledTextFieldArrayProps = ITextFieldProps &
+  IHookFormProps<string> & {
+    arrayRules?: RegisterOptions;
+  };
 
 export const ControlledTextFieldArray = (props: IControlledTextFieldArrayProps): JSX.Element => {
-  const { name, control, rules, defaultValue } = props;
+  const { name, control, rules, arrayRules, defaultValue } = props;
   const { fields, remove, append } = useFieldArray({
     name,
     control
@@ -14,6 +18,16 @@ export const ControlledTextFieldArray = (props: IControlledTextFieldArrayProps):
   return (
     <div>
       <div>
+        {/* <Controller
+          name={name}
+          control={control}
+          rules={arrayRules}
+          render={({ fieldState: { error } }) => (
+            <>
+              {error ? <ErrorMessage message={error.message} /> : null}
+            </>
+          )}
+        /> */}
         {fields.map((field, index) => {
           return (
             <div key={field.id}>
@@ -27,12 +41,11 @@ export const ControlledTextFieldArray = (props: IControlledTextFieldArrayProps):
                     field: { onChange, value, onBlur, name: fieldName },
                     fieldState: { error }
                   }) => {
-                    console.log('vvv', value, fieldName);
                     return (
                       <TextField
                         {...props}
                         onChange={(e, v) => {
-                          console.log('newValue', v);
+                          console.log('-------newValue', `${name}.${index}.value`, v);
                           onChange(v);
                         }}
                         value={value}

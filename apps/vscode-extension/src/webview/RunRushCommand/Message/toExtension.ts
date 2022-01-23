@@ -7,8 +7,9 @@ interface IToExtensionMessageCommandInfo {
   args: string[];
 }
 
+const vscode: Webview = window.acquireVsCodeApi();
+
 export const sendMessageToExtension: (message: IToExtensionMessage) => void = (message) => {
-  const vscode: Webview = window.acquireVsCodeApi();
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   vscode.postMessage(message);
 };
