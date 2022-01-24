@@ -1,8 +1,9 @@
-import { CSSProperties, MutableRefObject, ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
+import { CSSProperties, MutableRefObject, ReactNode, useEffect, useMemo, useRef } from 'react';
 import {
   CommandLineChoiceListParameter,
   CommandLineChoiceParameter,
   CommandLineFlagParameter,
+  CommandLineIntegerListParameter,
   CommandLineIntegerParameter,
   CommandLineParameterKind
 } from '@rushstack/ts-command-line';
@@ -50,6 +51,37 @@ export const ParameterForm = (): JSX.Element => {
   }, [commandName, parameters]);
 
   const resolverRef: MutableRefObject<Resolver | undefined> = useRef(undefined);
+  useEffect(() => {
+    const requiredListParameters: ICommandLineParameter[] = parameters.filter((parameter) => {
+      return parameter.required && (
+        parameter.kind === CommandLineParameterKind.ChoiceList ||
+        parameter.kind === CommandLineParameterKind.IntegerList ||
+        parameter.kind === CommandLineParameterKind.StringList
+      )
+    });
+    if (requiredListParameters.length) {
+      resolverRef.current = (values: FieldValues) => {
+        const errors: Record<string, string> = {};
+        for (const parameter of requiredListParameters) {
+          const fieldName: string = parameter.longName;
+          if (!Array.isArray(values[fieldName]) || !values[fieldName].some((item: { value: string }) => item.value)) {
+            errors[fieldName] = 'At least one valid item is required';
+          }
+        }
+        if (Object.keys(errors).length) {
+          return {
+            values: {},
+            errors,
+          }
+        } else {
+          return {
+            values,
+            errors,
+          }
+        }
+      }
+    }
+  }, [parameters]);
 
   const form: UseFormReturn = useForm({
     defaultValues,
@@ -191,7 +223,6 @@ export const ParameterForm = (): JSX.Element => {
             fieldNode = (
               <ControlledTextFieldArray
                 {...baseControllerProps}
-                arrayRules={baseControllerProps.rules}
                 type="number"
               />
             );
@@ -205,7 +236,6 @@ export const ParameterForm = (): JSX.Element => {
             fieldNode = (
               <ControlledTextFieldArray
                 {...baseControllerProps}
-                arrayRules={baseControllerProps.rules}
                 type="string"
               />
             );

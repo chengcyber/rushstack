@@ -1,33 +1,26 @@
 import { IconButton, ITextFieldProps, Stack, TextField } from '@fluentui/react';
-import { Controller, RegisterOptions, useFieldArray } from 'react-hook-form';
+import { Controller, RegisterOptions, useFieldArray, useFormState } from 'react-hook-form';
 import { ErrorMessage } from './ErrorMessage';
 
 import type { IHookFormProps } from './interface';
 
-export type IControlledTextFieldArrayProps = ITextFieldProps &
-  IHookFormProps<string> & {
-    arrayRules?: RegisterOptions;
-  };
+export type IControlledTextFieldArrayProps = ITextFieldProps & IHookFormProps<string>;
 
 export const ControlledTextFieldArray = (props: IControlledTextFieldArrayProps): JSX.Element => {
-  const { name, control, rules, arrayRules, defaultValue } = props;
+  const { name, control, rules, defaultValue } = props;
   const { fields, remove, append } = useFieldArray({
     name,
     control
   });
+  const { errors } = useFormState({
+    // name,
+    control,
+  });
+  console.log('errors', errors, name);
   return (
     <div>
       <div>
-        {/* <Controller
-          name={name}
-          control={control}
-          rules={arrayRules}
-          render={({ fieldState: { error } }) => (
-            <>
-              {error ? <ErrorMessage message={error.message} /> : null}
-            </>
-          )}
-        /> */}
+        <ErrorMessage message={errors?.[name]} />
         {fields.map((field, index) => {
           return (
             <div key={field.id}>
