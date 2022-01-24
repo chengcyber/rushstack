@@ -9,20 +9,34 @@ const theme: PartialTheme = {
   palette: {
     // themePrimary: 'var(--vscode-settings-headerForeground)',
     // themeSecondary: 'var(--vscode-button-secondaryForeground)',
+    neutralDark: 'var(--vscode-settings-headerForeground)',
   },
   defaultFontStyle: {
-    fontFamily: 'var(--vscode-editor-font-family)',
-    fontWeight: 'var(--vscode-editor-font-weight)',
-    fontSize: 'var(--vscode-editor-font-size)'
+    fontFamily: 'var(--vscode-font-family)',
+    fontWeight: 'var(--vscode-font-weight)',
+    fontSize: 'var(--vscode-font-size)'
   },
   semanticColors: {
-    bodyText: 'var(--vscode-editor-foreground)',
-    bodyBackground: 'var(--vscode-editor-background)',
     focusBorder: 'var(--vscode-focusBorder)',
+    errorText: 'var(--vscode-errorForeground)',
     buttonText: 'var(--vscode-button-foreground)',
     buttonBackground: 'var(--vscode-button-background)',
     buttonBackgroundHovered: 'var(--vscode-button-hoverBackground)',
-    errorText: 'var(--vscode-errorForeground)'
+    primaryButtonText: 'var(--vscode-button-foreground)',
+    primaryButtonBackground: 'var(--vscode-button-background)',
+    primaryButtonBackgroundHovered: 'var(--vscode-button-hoverBackground)',
+    inputIcon: 'var(--vscode-settings-textInputForeground)',
+    inputIconHovered: 'var(--vscode-settings-textInputForeground)',
+    inputText: 'var(--vscode-settings-textInputForeground)',
+    inputBackground: 'var(--vscode-settings-textInputBackground)',
+    inputPlaceholderText: 'var(--vscode-input-placeholderForeground)',
+    inputBorderHovered: 'var(--vscode-inputOption-activeForeground)',
+    inputFocusBorderAlt: 'var(--vscode-inputOption-activeBorder)',
+    inputBackgroundChecked: 'var(--vscode-inputOption-activeBackground)',
+    inputBackgroundCheckedHovered: 'var(--vscode-inputOption-activeBackground)',
+    inputForegroundChecked: 'var(--vscode-inputOption-activeForeground)',
+    bodyText: 'var(--vscode-editor-foreground)',
+    bodyBackground: 'var(--vscode-editor-background)',
   }
 };
 

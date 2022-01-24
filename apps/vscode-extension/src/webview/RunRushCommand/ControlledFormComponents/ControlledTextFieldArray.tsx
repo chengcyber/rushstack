@@ -1,10 +1,21 @@
-import { IconButton, ITextFieldProps, Stack, TextField } from '@fluentui/react';
-import { Controller, RegisterOptions, useFieldArray, useFormState } from 'react-hook-form';
-import { ErrorMessage } from './ErrorMessage';
+import { IStackTokens, ITextFieldProps, Stack, TextField } from '@fluentui/react';
+import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
+
+import { IconButton } from '../components/IconButton';
 
 import type { IHookFormProps } from './interface';
 
 export type IControlledTextFieldArrayProps = ITextFieldProps & IHookFormProps<string>;
+
+const textFieldStyles: ITextFieldProps['styles'] = {
+  root: {
+    width: '100%',
+  }
+}
+
+const stackTokens: IStackTokens = {
+  childrenGap: 6,
+}
 
 export const ControlledTextFieldArray = (props: IControlledTextFieldArrayProps): JSX.Element => {
   const { name, control, rules, defaultValue } = props;
@@ -12,15 +23,11 @@ export const ControlledTextFieldArray = (props: IControlledTextFieldArrayProps):
     name,
     control
   });
-  const { errors } = useFormState({
-    // name,
-    control,
-  });
-  console.log('errors', errors, name);
+  const { getValues } = useFormContext()
+  const arrayValues: { value: string | number }[] = getValues(name);
   return (
     <div>
-      <div>
-        <ErrorMessage message={errors?.[name]} />
+      <Stack tokens={stackTokens}>
         {fields.map((field, index) => {
           return (
             <div key={field.id}>
@@ -36,6 +43,7 @@ export const ControlledTextFieldArray = (props: IControlledTextFieldArrayProps):
                   }) => {
                     return (
                       <TextField
+                        styles={textFieldStyles}
                         {...props}
                         onChange={(e, v) => {
                           console.log('-------newValue', `${name}.${index}.value`, v);
@@ -49,31 +57,35 @@ export const ControlledTextFieldArray = (props: IControlledTextFieldArrayProps):
                     );
                   }}
                 />
-                <IconButton
-                  iconProps={{
-                    iconName: 'Delete'
-                  }}
-                  title="delete"
-                  ariaLabel="delete"
-                  onClick={() => remove(index)}
-                />
+                {
+                  arrayValues.length > 1 ? (
+                    <IconButton
+                      iconProps={{
+                        iconName: 'Delete'
+                      }}
+                      title="delete"
+                      ariaLabel="delete"
+                      onClick={() => remove(index)}
+                    />
+                  ) : null
+                }
               </Stack>
             </div>
           );
         })}
-      </div>
-      <IconButton
-        iconProps={{
-          iconName: 'Add'
-        }}
-        title="Add"
-        ariaLabel="Add"
-        onClick={() => {
-          append({
-            value: ''
-          });
-        }}
-      />
+        <IconButton
+          iconProps={{
+            iconName: 'Add'
+          }}
+          title="Add"
+          ariaLabel="Add"
+          onClick={() => {
+            append({
+              value: ''
+            });
+          }}
+        />
+      </Stack>
     </div>
   );
 };

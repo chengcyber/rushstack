@@ -15,6 +15,7 @@ export const ControlledToggle = (props: IControlledToggleProps): JSX.Element => 
       rules={rules}
       defaultValue={defaultValue}
       render={({ field: { onChange, value, onBlur, name: fieldName }, fieldState: { error } }) => {
+        console.log('ControlledToggle', fieldName, value);
         return (
           <>
             <Toggle

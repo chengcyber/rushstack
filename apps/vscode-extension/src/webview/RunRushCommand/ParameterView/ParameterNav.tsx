@@ -11,7 +11,7 @@ import {
 } from '../store/slices/ui';
 
 const navStyle: CSSProperties = {
-  width: '140px',
+  width: '160px',
   height: 'auto',
   boxSizing: 'border-box',
   overflowY: 'auto'
@@ -59,8 +59,9 @@ export const ParameterNav = (): JSX.Element => {
             id={`${NAV_LABEL_PREFIX}${longName}`}
             styles={{
               root: {
-                fontWeight
-              }
+                fontWeight,
+                cursor: 'pointer',
+              },
             }}
             key={text}
             required={parameter.required}

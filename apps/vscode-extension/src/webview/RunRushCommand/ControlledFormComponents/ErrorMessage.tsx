@@ -3,9 +3,10 @@ export interface IErrorMessageProps {
 }
 
 export const ErrorMessage = ({ message }: IErrorMessageProps): JSX.Element => {
+  console.log('ErrorMessage...', message);
   return message ? (
     <div role={'alert'}>
-      <p className="ms-TextField-errorMessage">{message}</p>
+      <p className="ms-TextField-errorMessage">{String(message)}</p>
     </div>
   ) : (
     <div />
