@@ -1,8 +1,17 @@
 .vscode/**
 .vscode-test/**
+.rush/**
+temp/**
+scripts/**
 src/**
 config/**
 .gitignore
+.eslintrc.js
+webpack.config.js
+webpack.dev.config.js
+node_modules/**
+*.log
+package.json.backup
 .yarnrc
 vsc-extension-quickstart.md
 **/tsconfig.json

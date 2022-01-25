@@ -607,6 +607,10 @@
       "allowedCategories": [ "libraries", "tests" ]
     },
     {
+      "name": "vsce",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
       "name": "webpack",
       "allowedCategories": [ "libraries", "tests" ]
     },
