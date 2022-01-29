@@ -2,20 +2,21 @@
   "name": "@rushstack/rush-sdk",
   "version": "5.59.2",
   "description": "An API for interacting with the Rush engine",
+  "homepage": "https://rushjs.io",
   "repository": {
     "type": "git",
     "url": "https://github.com/microsoft/rushstack.git",
     "directory": "apps/rush-sdk"
   },
-  "homepage": "https://rushjs.io",
+  "license": "MIT",
   "main": "lib/index.js",
   "typings": "dist/rush-lib.d.ts",
   "scripts": {
     "build": "heft test --clean"
   },
-  "license": "MIT",
   "dependencies": {
     "@rushstack/node-core-library": "workspace:*",
+    "@rushstack/ts-command-line": "workspace:*",
     "@types/node-fetch": "1.6.9",
     "tapable": "2.2.1"
   },

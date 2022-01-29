@@ -7,10 +7,12 @@
 /// <reference types="node" />
 
 import { AsyncSeriesHook } from 'tapable';
+import { CommandLineParser } from '@rushstack/ts-command-line';
 import { IPackageJson } from '@rushstack/node-core-library';
 import { ITerminal } from '@rushstack/node-core-library';
 import { ITerminalProvider } from '@rushstack/node-core-library';
 import { JsonObject } from '@rushstack/node-core-library';
+import { JsonSchema } from '@rushstack/node-core-library';
 import { PackageNameParser } from '@rushstack/node-core-library';
 import { Terminal } from '@rushstack/node-core-library';
 
@@ -313,6 +315,18 @@ export interface _IPnpmOptionsJson extends IPackageManagerOptionsJsonBase {
     useWorkspaces?: boolean;
 }
 
+// @beta
+export interface IRushCommandLineParserOptions {
+    // (undocumented)
+    alreadyReportedNodeTooNewError: boolean;
+    // Warning: (ae-incompatible-release-tags) The symbol "builtInPluginConfigurations" is marked as @beta, but its signature references "IBuiltInPluginConfiguration" which is marked as @internal
+    //
+    // (undocumented)
+    builtInPluginConfigurations: _IBuiltInPluginConfiguration[];
+    // (undocumented)
+    cwd: string;
+}
+
 // @beta (undocumented)
 export interface IRushPlugin {
     // (undocumented)
@@ -492,6 +506,37 @@ export class Rush {
     static launch(launcherVersion: string, arg: ILaunchOptions): void;
     static launchRushX(launcherVersion: string, options: ILaunchOptions): void;
     static get version(): string;
+}
+
+// @beta (undocumented)
+export class RushCommandLineParser extends CommandLineParser {
+    constructor(options?: Partial<IRushCommandLineParserOptions>);
+    // (undocumented)
+    execute(args?: string[]): Promise<boolean>;
+    // (undocumented)
+    flushTelemetry(): void;
+    // (undocumented)
+    get isDebug(): boolean;
+    // (undocumented)
+    protected onDefineParameters(): void;
+    // (undocumented)
+    protected onExecute(): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "PluginManager" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    readonly pluginManager: PluginManager;
+    // (undocumented)
+    readonly rushConfiguration: RushConfiguration;
+    // Warning: (ae-incompatible-release-tags) The symbol "rushGlobalFolder" is marked as @beta, but its signature references "RushGlobalFolder" which is marked as @internal
+    //
+    // (undocumented)
+    rushGlobalFolder: _RushGlobalFolder;
+    // (undocumented)
+    readonly rushSession: RushSession;
+    // Warning: (ae-forgotten-export) The symbol "Telemetry" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    telemetry: Telemetry | undefined;
 }
 
 // @public

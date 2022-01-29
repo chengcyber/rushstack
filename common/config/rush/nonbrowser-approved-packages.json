@@ -52,7 +52,7 @@
     },
     {
       "name": "@microsoft/rush-lib",
-      "allowedCategories": [ "libraries", "tests" ]
+      "allowedCategories": [ "libraries", "tests", "vsce" ]
     },
     {
       "name": "@microsoft/teams-js",
@@ -80,7 +80,7 @@
     },
     {
       "name": "@rushstack/eslint-config",
-      "allowedCategories": [ "libraries", "tests" ]
+      "allowedCategories": [ "libraries", "tests", "vsce" ]
     },
     {
       "name": "@rushstack/eslint-patch",
@@ -100,7 +100,7 @@
     },
     {
       "name": "@rushstack/heft",
-      "allowedCategories": [ "libraries", "tests" ]
+      "allowedCategories": [ "libraries", "tests", "vsce" ]
     },
     {
       "name": "@rushstack/heft-config-file",
@@ -116,7 +116,7 @@
     },
     {
       "name": "@rushstack/heft-node-rig",
-      "allowedCategories": [ "libraries", "tests" ]
+      "allowedCategories": [ "libraries", "tests", "vsce" ]
     },
     {
       "name": "@rushstack/heft-sass-plugin",
@@ -128,15 +128,15 @@
     },
     {
       "name": "@rushstack/heft-web-rig",
-      "allowedCategories": [ "libraries", "tests" ]
+      "allowedCategories": [ "libraries", "tests", "vsce" ]
     },
     {
       "name": "@rushstack/heft-webpack4-plugin",
-      "allowedCategories": [ "libraries", "tests" ]
+      "allowedCategories": [ "libraries", "tests", "vsce" ]
     },
     {
       "name": "@rushstack/heft-webpack5-plugin",
-      "allowedCategories": [ "tests" ]
+      "allowedCategories": [ "tests", "vsce" ]
     },
     {
       "name": "@rushstack/localization-plugin",
@@ -148,7 +148,7 @@
     },
     {
       "name": "@rushstack/node-core-library",
-      "allowedCategories": [ "libraries", "tests" ]
+      "allowedCategories": [ "libraries", "tests", "vsce" ]
     },
     {
       "name": "@rushstack/package-deps-hash",
@@ -168,7 +168,7 @@
     },
     {
       "name": "@rushstack/rush-sdk",
-      "allowedCategories": [ "libraries" ]
+      "allowedCategories": [ "libraries", "vsce" ]
     },
     {
       "name": "@rushstack/set-webpack-public-path-plugin",
@@ -188,7 +188,7 @@
     },
     {
       "name": "@rushstack/ts-command-line",
-      "allowedCategories": [ "libraries", "tests" ]
+      "allowedCategories": [ "libraries", "tests", "vsce" ]
     },
     {
       "name": "@rushstack/typings-generator",
@@ -228,7 +228,7 @@
     },
     {
       "name": "@typescript-eslint/eslint-plugin",
-      "allowedCategories": [ "libraries" ]
+      "allowedCategories": [ "libraries", "vsce" ]
     },
     {
       "name": "@typescript-eslint/experimental-utils",
@@ -236,7 +236,7 @@
     },
     {
       "name": "@typescript-eslint/parser",
-      "allowedCategories": [ "libraries", "tests" ]
+      "allowedCategories": [ "libraries", "tests", "vsce" ]
     },
     {
       "name": "@typescript-eslint/typescript-estree",
@@ -244,7 +244,7 @@
     },
     {
       "name": "@vscode/test-electron",
-      "allowedCategories": [ "libraries" ]
+      "allowedCategories": [ "libraries", "vsce" ]
     },
     {
       "name": "@yarnpkg/lockfile",
@@ -324,7 +324,7 @@
     },
     {
       "name": "eslint",
-      "allowedCategories": [ "libraries", "tests" ]
+      "allowedCategories": [ "libraries", "tests", "vsce" ]
     },
     {
       "name": "eslint-plugin-promise",
@@ -360,7 +360,7 @@
     },
     {
       "name": "glob",
-      "allowedCategories": [ "libraries" ]
+      "allowedCategories": [ "libraries", "vsce" ]
     },
     {
       "name": "glob-escape",
@@ -400,7 +400,7 @@
     },
     {
       "name": "html-webpack-plugin",
-      "allowedCategories": [ "libraries", "tests" ]
+      "allowedCategories": [ "libraries", "tests", "vsce" ]
     },
     {
       "name": "https-proxy-agent",
@@ -480,7 +480,7 @@
     },
     {
       "name": "mocha",
-      "allowedCategories": [ "libraries" ]
+      "allowedCategories": [ "libraries", "vsce" ]
     },
     {
       "name": "node-fetch",
@@ -604,11 +604,11 @@
     },
     {
       "name": "typescript",
-      "allowedCategories": [ "libraries", "tests" ]
+      "allowedCategories": [ "libraries", "tests", "vsce" ]
     },
     {
       "name": "vsce",
-      "allowedCategories": [ "libraries" ]
+      "allowedCategories": [ "libraries", "vsce" ]
     },
     {
       "name": "webpack",
@@ -616,7 +616,7 @@
     },
     {
       "name": "webpack-bundle-analyzer",
-      "allowedCategories": [ "tests" ]
+      "allowedCategories": [ "tests", "vsce" ]
     },
     {
       "name": "webpack-cli",

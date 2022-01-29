@@ -56,6 +56,7 @@ import { PhasedScriptAction } from './scriptActions/PhasedScriptAction';
 import { IBuiltInPluginConfiguration } from '../pluginFramework/PluginLoader/BuiltInPluginLoader';
 
 /**
+ * @beta
  * Options for `RushCommandLineParser`.
  */
 export interface IRushCommandLineParserOptions {
@@ -64,6 +65,9 @@ export interface IRushCommandLineParserOptions {
   builtInPluginConfigurations: IBuiltInPluginConfiguration[];
 }
 
+/**
+ * @beta
+ */
 export class RushCommandLineParser extends CommandLineParser {
   public telemetry: Telemetry | undefined;
   public rushGlobalFolder!: RushGlobalFolder;
