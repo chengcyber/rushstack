@@ -6,6 +6,9 @@ import { CommandLineFlagParameter } from '@rushstack/ts-command-line';
 import { BaseInstallAction } from './BaseInstallAction';
 import { IInstallManagerOptions } from '../../logic/base/BaseInstallManager';
 import { RushCommandLineParser } from '../RushCommandLineParser';
+import { SelectionParameterSet } from '../SelectionParameterSet';
+import { AlreadyReportedError, ConsoleTerminalProvider, Terminal } from '@rushstack/node-core-library';
+import { PrintUtilities } from '@rushstack/terminal';
 
 export class UpdateAction extends BaseInstallAction {
   private _fullParameter!: CommandLineFlagParameter;
@@ -34,6 +37,17 @@ export class UpdateAction extends BaseInstallAction {
 
   protected onDefineParameters(): void {
     super.onDefineParameters();
+
+    if (this.rushConfiguration.hasSplitWorkspaceProject) {
+      // Partial update is supported only when there are split workspace project
+      this._selectionParameters = new SelectionParameterSet(this.rushConfiguration, this, {
+        // Include lockfile processing since this expands the selection, and we need to select
+        // at least the same projects selected with the same query to "rush build"
+        includeExternalDependencies: true,
+        // Disable filtering because rush-project.json is riggable and therefore may not be available
+        enableFiltering: false
+      });
+    }
 
     this._fullParameter = this.defineFlagParameter({
       parameterLongName: '--full',
@@ -67,6 +81,40 @@ export class UpdateAction extends BaseInstallAction {
   }
 
   protected async buildInstallOptionsAsync(): Promise<IInstallManagerOptions> {
+    const terminal: Terminal = new Terminal(new ConsoleTerminalProvider());
+
+    /**
+     * Partial update should only affects on split workspace project, and
+     * not affects on normal rush workspace projects.
+     */
+    const pnpmFilterArguments: string[] = [];
+    let splitWorkspacePnpmFilterArguments: string[] = [];
+
+    if (this._selectionParameters?.isSelectionSpecified) {
+      const selected = await this._selectionParameters.getSelectedProjectsAsync(terminal);
+      let hasSelectedSplitWorkspaceProject: boolean = false;
+      for (const rushProject of selected.values()) {
+        if (rushProject.splitWorkspace) {
+          hasSelectedSplitWorkspaceProject = true;
+          break;
+        }
+      }
+      // Throw error when there is no split workspace project selected
+      if (!hasSelectedSplitWorkspaceProject) {
+        terminal.writeLine();
+        terminal.writeErrorLine(
+          PrintUtilities.wrapWords(
+            `Project filtering arguments cannot be used when running "rush update" without selecting split workspace projects. Run the command again with specifying a split workspace project.`
+          )
+        );
+        throw new AlreadyReportedError();
+      }
+
+      splitWorkspacePnpmFilterArguments = (
+        await this._selectionParameters.getPnpmFilterArgumentsAsync(terminal)
+      ).splitWorkspacePnpmFilterArguments;
+    }
+
     return {
       debug: this.parser.isDebug,
       allowShrinkwrapUpdates: true,
@@ -80,8 +128,8 @@ export class UpdateAction extends BaseInstallAction {
       // Because the 'defaultValue' option on the _maxInstallAttempts parameter is set,
       // it is safe to assume that the value is not null
       maxInstallAttempts: this._maxInstallAttempts.value!,
-      pnpmFilterArguments: [],
-      splitWorkspacePnpmFilterArguments: [],
+      pnpmFilterArguments,
+      splitWorkspacePnpmFilterArguments,
       checkOnly: false
     };
   }

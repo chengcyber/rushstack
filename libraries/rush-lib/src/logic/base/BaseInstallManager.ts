@@ -185,14 +185,17 @@ export abstract class BaseInstallManager {
 
     // Prevent update when using a filter, as modifications to the shrinkwrap shouldn't be saved
     if (this.options.allowShrinkwrapUpdates && isFilteredInstall) {
-      console.log();
-      console.log(
-        colors.red(
-          'Project filtering arguments cannot be used when running "rush update". Run the command again ' +
-            'without specifying these arguments.'
-        )
-      );
-      throw new AlreadyReportedError();
+      // Allow partial update when there are split workspace projects.
+      if (!this.rushConfiguration.hasSplitWorkspaceProject) {
+        console.log();
+        console.log(
+          colors.red(
+            'Project filtering arguments cannot be used when running "rush update". Run the command again ' +
+              'without specifying these arguments.'
+          )
+        );
+        throw new AlreadyReportedError();
+      }
     }
 
     const { shrinkwrapIsUpToDate, variantIsUpToDate } = await this.prepareAsync();

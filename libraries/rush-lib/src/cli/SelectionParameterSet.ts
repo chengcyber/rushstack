@@ -41,6 +41,7 @@ export class SelectionParameterSet {
   private readonly _toVersionPolicy: CommandLineStringListParameter;
 
   private readonly _selectorParserByScope: Map<string, ISelectorParser<RushConfigurationProject>>;
+  private readonly _selectors: CommandLineStringListParameter[] = [];
 
   public constructor(
     rushConfiguration: RushConfiguration,
@@ -181,6 +182,27 @@ export class SelectionParameterSet {
         ' belonging to VERSION_POLICY_NAME.' +
         ' For details, refer to the website article "Selecting subsets of projects".'
     });
+
+    this._selectors = [
+      this._onlyProject,
+      this._fromProject,
+      this._toProject,
+      this._toExceptProject,
+      this._impactedByProject,
+      this._impactedByExceptProject
+    ];
+  }
+
+  /**
+   * Check if any of the selection parameters have a value specified on the command line
+   *
+   * Returns true if specifying any selection parameters, otherwise false.
+   */
+  public get isSelectionSpecified(): boolean {
+    const isSelectionSpecified: boolean = this._selectors.some(
+      (param: CommandLineStringListParameter) => param.values.length > 0
+    );
+    return isSelectionSpecified;
   }
 
   /**
@@ -197,22 +219,8 @@ export class SelectionParameterSet {
       (this._toProject.values as string[]).push(`version-policy:${value}`);
     }
 
-    const selectors: CommandLineStringListParameter[] = [
-      this._onlyProject,
-      this._fromProject,
-      this._toProject,
-      this._toExceptProject,
-      this._impactedByProject,
-      this._impactedByExceptProject
-    ];
-
-    // Check if any of the selection parameters have a value specified on the command line
-    const isSelectionSpecified: boolean = selectors.some(
-      (param: CommandLineStringListParameter) => param.values.length > 0
-    );
-
     // If no selection parameters are specified, return everything
-    if (!isSelectionSpecified) {
+    if (!this.isSelectionSpecified) {
       return new Set(this._rushConfiguration.projects);
     }
 
@@ -230,7 +238,7 @@ export class SelectionParameterSet {
       // --impacted-by-except
       impactedByExceptProjects
     ] = await Promise.all(
-      selectors.map((param: CommandLineStringListParameter) => {
+      this._selectors.map((param: CommandLineStringListParameter) => {
         return this._evaluateProjectParameterAsync(param, terminal);
       })
     );
@@ -277,7 +285,7 @@ export class SelectionParameterSet {
       const selection: Set<RushConfigurationProject> = await this.getSelectedProjectsAsync(terminal);
 
       for (const project of selection) {
-        if (project.splitWorkspace) {
+        if (!project.splitWorkspace) {
           pnpmFilterArguments.push('--filter', `${project.packageName}`);
         } else {
           splitWorkspacePnpmFilterArguments.push('--filter', `${project.packageName}`);
