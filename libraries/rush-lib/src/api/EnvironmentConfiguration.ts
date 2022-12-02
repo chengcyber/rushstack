@@ -80,6 +80,15 @@ export enum EnvironmentVariableNames {
   RUSH_PNPM_STORE_PATH = 'RUSH_PNPM_STORE_PATH',
 
   /**
+   * When using PNPM as the package manager, this variable can be used to configure the path that
+   * PNPM will use as the cache directory.
+   *
+   * If a relative path is used, then the cache path will be resolved relative to the process's
+   * current working directory.  An absolute path is recommended.
+   */
+  RUSH_PNPM_CACHE_PATH = 'RUSH_PNPM_CACHE_PATH',
+
+  /**
    * When using PNPM as the package manager, this variable can be used to control whether or not PNPM
    * validates the integrity of the PNPM store during installation. The value of this environment variable must be
    * `1` (for true) or `0` (for false). If not specified, defaults to the value in .npmrc.
@@ -186,6 +195,8 @@ export class EnvironmentConfiguration {
 
   private static _pnpmStorePathOverride: string | undefined;
 
+  private static _pnpmCachePathOverride: string | undefined;
+
   private static _pnpmVerifyStoreIntegrity: boolean | undefined;
 
   private static _rushGlobalFolderOverride: string | undefined;
@@ -246,6 +257,15 @@ export class EnvironmentConfiguration {
   public static get pnpmStorePathOverride(): string | undefined {
     EnvironmentConfiguration._ensureValidated();
     return EnvironmentConfiguration._pnpmStorePathOverride;
+  }
+
+  /**
+   * An override for the PNPM cache path, if `pnpmCache` configuration is set to 'path'
+   * See {@link EnvironmentVariableNames.RUSH_PNPM_CACHE_PATH}
+   */
+  public static get pnpmCachePathOverride(): string | undefined {
+    EnvironmentConfiguration._ensureValidated();
+    return EnvironmentConfiguration._pnpmCachePathOverride;
   }
 
   /**
@@ -383,6 +403,14 @@ export class EnvironmentConfiguration {
 
           case EnvironmentVariableNames.RUSH_PNPM_STORE_PATH: {
             EnvironmentConfiguration._pnpmStorePathOverride =
+              value && !options.doNotNormalizePaths
+                ? EnvironmentConfiguration._normalizeDeepestParentFolderPath(value) || value
+                : value;
+            break;
+          }
+
+          case EnvironmentVariableNames.RUSH_PNPM_CACHE_PATH: {
+            EnvironmentConfiguration._pnpmCachePathOverride =
               value && !options.doNotNormalizePaths
                 ? EnvironmentConfiguration._normalizeDeepestParentFolderPath(value) || value
                 : value;

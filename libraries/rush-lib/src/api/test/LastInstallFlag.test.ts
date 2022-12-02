@@ -86,10 +86,42 @@ describe(LastInstallFlag.name, () => {
     }).toThrowError(/PNPM store path/);
   });
 
-  it("doesn't throw an error if conditions for error aren't met", () => {
+  it("doesn't throw an error for pnpmStorePath if conditions for error aren't met", () => {
     const flag1: LastInstallFlag = new LastInstallFlag(TEMP_DIR_PATH, {
       packageManager: 'pnpm',
       storePath: `${TEMP_DIR_PATH}/pnpm-store`
+    });
+    const flag2: LastInstallFlag = new LastInstallFlag(TEMP_DIR_PATH, {
+      packageManager: 'npm'
+    });
+
+    flag1.create();
+    expect(() => {
+      flag2.checkValidAndReportStoreIssues({ rushVerb: 'install' });
+    }).not.toThrow();
+    expect(flag2.checkValidAndReportStoreIssues({ rushVerb: 'install' })).toEqual(false);
+  });
+
+  it("throws an error if new pnpmCachePath doesn't match the old one", () => {
+    const flag1: LastInstallFlag = new LastInstallFlag(TEMP_DIR_PATH, {
+      packageManager: 'pnpm',
+      pnpmCachePath: `${TEMP_DIR_PATH}/pnpm-cache`
+    });
+    const flag2: LastInstallFlag = new LastInstallFlag(TEMP_DIR_PATH, {
+      packageManager: 'pnpm',
+      pnpmCachePath: `${TEMP_DIR_PATH}/temp-cache`
+    });
+
+    flag1.create();
+    expect(() => {
+      flag2.checkValidAndReportStoreIssues({ rushVerb: 'install' });
+    }).toThrowError(/PNPM cache path/);
+  });
+
+  it("doesn't throw an cache path error for pnpmCachePath if conditions for error aren't met", () => {
+    const flag1: LastInstallFlag = new LastInstallFlag(TEMP_DIR_PATH, {
+      packageManager: 'pnpm',
+      pnpmCachePath: `${TEMP_DIR_PATH}/pnpm-cache`
     });
     const flag2: LastInstallFlag = new LastInstallFlag(TEMP_DIR_PATH, {
       packageManager: 'npm'

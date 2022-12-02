@@ -16,6 +16,12 @@ import { EnvironmentConfiguration } from '../../api/EnvironmentConfiguration';
 export type PnpmStoreOptions = 'local' | 'global';
 
 /**
+ * This represents the available PNPM cache options
+ * @public
+ */
+export type PnpmCacheOptions = 'local' | 'global';
+
+/**
  * @beta
  */
 export interface IPnpmPeerDependencyRules {
@@ -46,6 +52,10 @@ export interface IPnpmOptionsJson extends IPackageManagerOptionsJsonBase {
    * {@inheritDoc PnpmOptionsConfiguration.pnpmStore}
    */
   pnpmStore?: PnpmStoreOptions;
+  /**
+   * {@inheritDoc PnpmOptionsConfiguration.pnpmCache}
+   */
+  pnpmCache?: PnpmCacheOptions;
   /**
    * {@inheritDoc PnpmOptionsConfiguration.strictPeerDependencies}
    */
@@ -124,6 +134,23 @@ export class PnpmOptionsConfiguration extends PackageManagerOptionsConfiguration
    * Will be overridden by environment variable RUSH_PNPM_STORE_PATH
    */
   public readonly pnpmStorePath: string;
+
+  /**
+   * The method used to resolve the cache used by PNPM.
+   *
+   * @remarks
+   * Available options:
+   *  - local: Use the standard Rush store path: common/temp/pnpm-cache
+   *  - global: Use PNPM's global cache path
+   */
+  public readonly pnpmCache: PnpmCacheOptions;
+
+  /**
+   * The path for PNPM to use as the cache directory.
+   *
+   * Will be overridden by environment variable RUSH_PNPM_CACHE_PATH
+   */
+  public readonly pnpmCachePath: string;
 
   /**
    * If true, then Rush will add the "--strict-peer-dependencies" option when invoking PNPM.
@@ -267,6 +294,7 @@ export class PnpmOptionsConfiguration extends PackageManagerOptionsConfiguration
     this._json = json;
     this._jsonFilename = jsonFilename;
     this.pnpmStore = json.pnpmStore || 'local';
+    this.pnpmCache = json.pnpmCache || 'global';
     if (EnvironmentConfiguration.pnpmStorePathOverride) {
       this.pnpmStorePath = EnvironmentConfiguration.pnpmStorePathOverride;
     } else if (this.pnpmStore === 'global') {
@@ -274,6 +302,15 @@ export class PnpmOptionsConfiguration extends PackageManagerOptionsConfiguration
     } else {
       this.pnpmStorePath = `${commonTempFolder}/pnpm-store`;
     }
+
+    if (EnvironmentConfiguration.pnpmCachePathOverride) {
+      this.pnpmCachePath = EnvironmentConfiguration.pnpmCachePathOverride;
+    } else if (this.pnpmCache === 'global') {
+      this.pnpmCachePath = '';
+    } else {
+      this.pnpmCachePath = `${commonTempFolder}/pnpm-cache`;
+    }
+
     this.strictPeerDependencies = !!json.strictPeerDependencies;
     this.preventManualShrinkwrapChanges = !!json.preventManualShrinkwrapChanges;
     this.useWorkspaces = !!json.useWorkspaces;

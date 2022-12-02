@@ -26,6 +26,12 @@
       "enum": ["local", "global"]
     },
 
+    "pnpmCache": {
+      "description": "Specifies the location of the PNPM cache.  There are two possible values:\n\n\"local\" - use the \"pnpm-cache\" folder in the current configured temp folder: \"common/temp/pnpm-cache\" by default.\n\"global\" - use PNPM's global cache, which has the benefit of being shared across multiple repo folders, but the disadvantage of less isolation for builds (e.g. bugs or incompatibilities when two repos use different releases of PNPM)\n\nIn both cases, the cache path can be overridden by the environment variable RUSH_PNPM_CACHE_PATH.\n\nThe default value is \"global\".",
+      "type": "string",
+      "enum": ["local", "global"]
+    },
+
     "environmentVariables": {
       "description": "Environment variables for PNPM invocation",
       "type": "object",

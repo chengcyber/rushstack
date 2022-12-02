@@ -5,7 +5,8 @@
   "projectFolderMaxDepth": 99,
 
   "pnpmOptions": {
-    "pnpmStore": "local"
+    "pnpmStore": "local",
+    "pnpmCache": "local"
   },
 
   "approvedPackagesPolicy": {

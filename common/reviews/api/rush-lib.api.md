@@ -156,6 +156,7 @@ export class EnvironmentConfiguration {
     static get gitBinaryPath(): string | undefined;
     // (undocumented)
     static parseBooleanEnvironmentVariable(name: string, value: string | undefined): boolean | undefined;
+    static get pnpmCachePathOverride(): string | undefined;
     static get pnpmStorePathOverride(): string | undefined;
     static get pnpmVerifyStoreIntegrity(): boolean | undefined;
     static reset(): void;
@@ -178,6 +179,7 @@ export enum EnvironmentVariableNames {
     RUSH_GLOBAL_FOLDER = "RUSH_GLOBAL_FOLDER",
     RUSH_INVOKED_FOLDER = "RUSH_INVOKED_FOLDER",
     RUSH_PARALLELISM = "RUSH_PARALLELISM",
+    RUSH_PNPM_CACHE_PATH = "RUSH_PNPM_CACHE_PATH",
     RUSH_PNPM_STORE_PATH = "RUSH_PNPM_STORE_PATH",
     RUSH_PNPM_VERIFY_STORE_INTEGRITY = "RUSH_PNPM_VERIFY_STORE_INTEGRITY",
     RUSH_PREVIEW_VERSION = "RUSH_PREVIEW_VERSION",
@@ -467,6 +469,8 @@ export interface _IPnpmOptionsJson extends IPackageManagerOptionsJsonBase {
     globalPatchedDependencies?: Record<string, string>;
     // Warning: (ae-forgotten-export) The symbol "IPnpmPeerDependencyRules" needs to be exported by the entry point index.d.ts
     globalPeerDependencyRules?: IPnpmPeerDependencyRules;
+    // Warning: (ae-forgotten-export) The symbol "PnpmCacheOptions" needs to be exported by the entry point index.d.ts
+    pnpmCache?: PnpmCacheOptions;
     pnpmStore?: PnpmStoreOptions;
     preventManualShrinkwrapChanges?: boolean;
     strictPeerDependencies?: boolean;
@@ -724,6 +728,8 @@ export class PnpmOptionsConfiguration extends PackageManagerOptionsConfiguration
     static loadFromJsonFileOrThrow(jsonFilename: string, commonTempFolder: string): PnpmOptionsConfiguration;
     // @internal (undocumented)
     static loadFromJsonObject(json: _IPnpmOptionsJson, commonTempFolder: string): PnpmOptionsConfiguration;
+    readonly pnpmCache: PnpmCacheOptions;
+    readonly pnpmCachePath: string;
     readonly pnpmStore: PnpmStoreOptions;
     readonly pnpmStorePath: string;
     readonly preventManualShrinkwrapChanges: boolean;

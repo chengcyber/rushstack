@@ -108,4 +108,32 @@ describe(EnvironmentConfiguration.name, () => {
       expect(EnvironmentConfiguration.pnpmStorePathOverride).toEqual(expectedValue);
     });
   });
+
+  describe('pnpmCachePathOverride', () => {
+    const ENV_VAR: string = 'RUSH_PNPM_CACHE_PATH';
+
+    it('returns undefined for unset environment variable', () => {
+      EnvironmentConfiguration.validate();
+
+      expect(EnvironmentConfiguration.pnpmCachePathOverride).not.toBeDefined();
+    });
+
+    it('returns the expected path from environment variable without normalization', () => {
+      const expectedValue: string = '/var/temp';
+      process.env[ENV_VAR] = expectedValue;
+      EnvironmentConfiguration.validate({ doNotNormalizePaths: true });
+
+      expect(EnvironmentConfiguration.pnpmCachePathOverride).toEqual(expectedValue);
+    });
+
+    it('returns expected path from environment variable with normalization', () => {
+      const expectedValue: string = path.resolve(process.cwd(), 'temp');
+      const envVar: string = './temp';
+      process.env[ENV_VAR] = envVar;
+
+      EnvironmentConfiguration.validate();
+
+      expect(EnvironmentConfiguration.pnpmCachePathOverride).toEqual(expectedValue);
+    });
+  });
 });

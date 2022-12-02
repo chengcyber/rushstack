@@ -331,6 +331,9 @@ export class RushPnpmCommandLineParser {
     if (rushConfiguration.pnpmOptions.pnpmStorePath) {
       pnpmEnvironmentMap.set('NPM_CONFIG_STORE_DIR', rushConfiguration.pnpmOptions.pnpmStorePath);
     }
+    if (rushConfiguration.pnpmOptions.pnpmCachePath) {
+      pnpmEnvironmentMap.set('NPM_CONFIG_CACHE_DIR', rushConfiguration.pnpmOptions.pnpmCachePath);
+    }
 
     if (rushConfiguration.pnpmOptions.environmentVariables) {
       for (const [envKey, { value: envValue, override }] of Object.entries(

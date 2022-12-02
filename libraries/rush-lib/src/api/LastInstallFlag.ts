@@ -105,9 +105,27 @@ export class LastInstallFlag {
             ) {
               throw new Error(
                 'Current PNPM store path does not match the last one used. This may cause inconsistency in your builds.\n\n' +
-                  `If you wish to install with the new store path, please run "rush ${rushVerb} --purge"\n\n` +
+                `If you wish to install with the new store path, please run "rush ${rushVerb} --purge"\n\n` +
                   `Old Path: ${normalizedOldStorePath}\n` +
                   `New Path: ${normalizedNewStorePath}`
+              );
+            }
+
+            const normalizedOldCachePath: string = oldState.pnpmCachePath
+              ? Path.convertToPlatformDefault(oldState.pnpmCachePath)
+              : '<global>';
+            const normalizedNewCachePath: string = newState.pnpmCachePath
+              ? Path.convertToPlatformDefault(newState.pnpmCachePath)
+              : '<global>';
+            if (
+              // Throw if the store path changed
+              normalizedOldCachePath !== normalizedNewCachePath
+            ) {
+              throw new Error(
+                'Current PNPM cache path does not match the last one used. This may cause inconsistency in your builds.\n\n' +
+                `If you wish to install with the new cache path, please run "rush ${rushVerb} --purge"\n\n` +
+                `Old Path: ${normalizedOldCachePath}\n` +
+                `New Path: ${normalizedNewCachePath}`
               );
             }
           }
@@ -178,6 +196,7 @@ export class LastInstallFlagFactory {
 
     if (currentState.packageManager === 'pnpm' && rushConfiguration.pnpmOptions) {
       currentState.storePath = rushConfiguration.pnpmOptions.pnpmStorePath;
+      currentState.pnpmCachePath = rushConfiguration.pnpmOptions.pnpmCachePath;
       if (rushConfiguration.pnpmOptions.useWorkspaces) {
         currentState.workspaces = rushConfiguration.pnpmOptions.useWorkspaces;
       }

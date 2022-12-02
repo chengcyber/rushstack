@@ -608,6 +608,13 @@ export abstract class BaseInstallManager {
         args.push('--store', this._rushConfiguration.pnpmOptions.pnpmStorePath);
       }
 
+      if (this._rushConfiguration.pnpmOptions.pnpmCache === 'local' || EnvironmentConfiguration.pnpmCachePathOverride) {
+        // cache-dir is added by pnpm@6.10.0 https://github.com/pnpm/pnpm/releases/tag/v6.10.0
+        if (semver.gte(this._rushConfiguration.packageManagerToolVersion, '6.10.0')) {
+          args.push('--cache-dir', this._rushConfiguration.pnpmOptions.pnpmCachePath);
+        }
+      }
+
       const { pnpmVerifyStoreIntegrity } = EnvironmentConfiguration;
       if (pnpmVerifyStoreIntegrity !== undefined) {
         args.push(`--verify-store-integrity`, `${pnpmVerifyStoreIntegrity}`);

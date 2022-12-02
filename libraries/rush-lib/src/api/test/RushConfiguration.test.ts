@@ -68,6 +68,11 @@ describe(RushConfiguration.name, () => {
       './repo/common/temp/pnpm-store'
     );
     assertPathProperty(
+      'pnpmCachePath',
+      rushConfiguration.pnpmOptions.pnpmCachePath,
+      './repo/common/temp/pnpm-cache'
+    );
+    assertPathProperty(
       'packageManagerToolFilename',
       rushConfiguration.packageManagerToolFilename,
       './repo/common/temp/npm-local/node_modules/.bin/npm'
@@ -146,6 +151,11 @@ describe(RushConfiguration.name, () => {
       './repo/common/temp/pnpm-store'
     );
     assertPathProperty(
+      'pnpmCachePath',
+      rushConfiguration.pnpmOptions.pnpmCachePath,
+      './repo/common/temp/pnpm-cache'
+    );
+    assertPathProperty(
       'packageManagerToolFilename',
       rushConfiguration.packageManagerToolFilename,
       './repo/common/temp/pnpm-local/node_modules/.bin/pnpm'
@@ -220,6 +230,11 @@ describe(RushConfiguration.name, () => {
       'pnpmStorePath',
       rushConfiguration.pnpmOptions.pnpmStorePath,
       path.join(expectedValue, 'pnpm-store')
+    );
+    assertPathProperty(
+      'pnpmCachePath',
+      rushConfiguration.pnpmOptions.pnpmCachePath,
+      path.join(expectedValue, 'pnpm-cache')
     );
     assertPathProperty(
       'packageManagerToolFilename',
@@ -297,6 +312,80 @@ describe(RushConfiguration.name, () => {
     });
 
     it(`throws an error when invalid pnpmStore is defined`, () => {
+      const RUSH_JSON_FILENAME: string = path.resolve(__dirname, 'repo', 'rush-pnpm-invalid-store.json');
+      expect(() => {
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const rushConfiguration: RushConfiguration =
+          RushConfiguration.loadFromConfigurationFile(RUSH_JSON_FILENAME);
+      }).toThrow();
+    });
+  });
+
+  describe('PNPM Cache Paths', () => {
+    afterEach(() => {
+      EnvironmentConfiguration['_pnpmCachePathOverride'] = undefined;
+    });
+
+    const PNPM_CACHE_PATH_ENV: string = 'RUSH_PNPM_CACHE_PATH';
+
+    describe('Loading repo/rush-pnpm-local.json', () => {
+      const RUSH_JSON_FILENAME: string = path.resolve(__dirname, 'pnpmCacheLocal', 'rush.json');
+
+      it(`loads the correct path when pnpmCache = "local"`, () => {
+        const EXPECT_STORE_PATH: string = path.resolve(__dirname, 'pnpmCacheLocal', 'common', 'temp', 'pnpm-cache');
+        const rushConfiguration: RushConfiguration =
+          RushConfiguration.loadFromConfigurationFile(RUSH_JSON_FILENAME);
+
+        expect(rushConfiguration.packageManager).toEqual('pnpm');
+        expect(rushConfiguration.pnpmOptions.pnpmCache).toEqual('local');
+        expect(Path.convertToSlashes(rushConfiguration.pnpmOptions.pnpmCachePath)).toEqual(
+          Path.convertToSlashes(EXPECT_STORE_PATH)
+        );
+        expect(path.isAbsolute(rushConfiguration.pnpmOptions.pnpmCachePath)).toEqual(true);
+      });
+
+      it('loads the correct path when environment variable is defined', () => {
+        const EXPECT_CACHE_PATH: string = path.resolve('/var/temp');
+        process.env[PNPM_CACHE_PATH_ENV] = EXPECT_CACHE_PATH;
+
+        const rushConfiguration: RushConfiguration =
+          RushConfiguration.loadFromConfigurationFile(RUSH_JSON_FILENAME);
+
+        expect(rushConfiguration.packageManager).toEqual('pnpm');
+        expect(rushConfiguration.pnpmOptions.pnpmCache).toEqual('local');
+        expect(rushConfiguration.pnpmOptions.pnpmCachePath).toEqual(EXPECT_CACHE_PATH);
+        expect(path.isAbsolute(rushConfiguration.pnpmOptions.pnpmCachePath)).toEqual(true);
+      });
+    });
+
+    describe('Loading repo/rush-pnpm-global.json', () => {
+      const RUSH_JSON_FILENAME: string = path.resolve(__dirname, 'pnpmCacheGlobal', 'rush.json');
+
+      it(`loads the correct path when pnpmStore = "global"`, () => {
+        const EXPECT_CACHE_PATH: string = '';
+        const rushConfiguration: RushConfiguration =
+          RushConfiguration.loadFromConfigurationFile(RUSH_JSON_FILENAME);
+
+        expect(rushConfiguration.packageManager).toEqual('pnpm');
+        expect(rushConfiguration.pnpmOptions.pnpmCache).toEqual('global');
+        expect(rushConfiguration.pnpmOptions.pnpmCache).toEqual(EXPECT_CACHE_PATH);
+      });
+
+      it('loads the correct path when environment variable is defined', () => {
+        const EXPECT_CACHE_PATH: string = path.resolve('/var/temp');
+        process.env[PNPM_CACHE_PATH_ENV] = EXPECT_CACHE_PATH;
+
+        const rushConfiguration: RushConfiguration =
+          RushConfiguration.loadFromConfigurationFile(RUSH_JSON_FILENAME);
+
+        expect(rushConfiguration.packageManager).toEqual('pnpm');
+        expect(rushConfiguration.pnpmOptions.pnpmCache).toEqual('global');
+        expect(rushConfiguration.pnpmOptions.pnpmCachePath).toEqual(EXPECT_CACHE_PATH);
+      });
+    });
+
+    it(`throws an error when invalid pnpmCache is defined`, () => {
       const RUSH_JSON_FILENAME: string = path.resolve(__dirname, 'repo', 'rush-pnpm-invalid-store.json');
       expect(() => {
         // @ts-ignore
