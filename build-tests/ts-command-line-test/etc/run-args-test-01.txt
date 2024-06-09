@@ -1,0 +1,4 @@
+Running "widget run --title Hello 1 2 3":
+Business logic configured the logger: verbose=false
+Console Title: Hello
+Arguments to be executed: ["1","2","3"]

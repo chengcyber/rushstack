@@ -631,6 +631,10 @@
       "allowedCategories": [ "libraries" ]
     },
     {
+      "name": "jest-diff",
+      "allowedCategories": [ "tests" ]
+    },
+    {
       "name": "jest-environment-jsdom",
       "allowedCategories": [ "libraries" ]
     },
@@ -862,7 +866,6 @@
       "name": "tslint",
       "allowedCategories": [ "libraries", "tests" ]
     },
-
     {
       "name": "typescript",
       "allowedCategories": [ "libraries", "tests", "vscode-extensions" ]

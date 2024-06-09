@@ -1,0 +1,4 @@
+Running "widget push --protocol webdav --force":
+Business logic configured the logger: verbose=false
+Received parameters: force=true, protocol="webdav"
+Business logic did the work.

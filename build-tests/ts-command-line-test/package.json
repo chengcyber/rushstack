@@ -4,14 +4,19 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "node build.js",
+    "build": "heft build --clean",
     "start": "node ./lib/start.js",
-    "_phase:build": "node build.js"
+    "_phase:build": "heft build --clean"
   },
   "devDependencies": {
+    "@rushstack/heft": "workspace:*",
+    "@rushstack/heft-node-rig": "workspace:*",
+    "@rushstack/node-core-library": "workspace:*",
+    "@rushstack/terminal": "workspace:*",
     "@rushstack/ts-command-line": "workspace:*",
     "@types/node": "18.17.15",
     "fs-extra": "~7.0.1",
+    "jest-diff": "~29.7.0",
     "typescript": "~5.4.2"
   }
 }

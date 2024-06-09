@@ -1,0 +1,12 @@
+Running "widget push --help":
+usage: widget push [-h] [-f] [--protocol {ftp,webdav,scp}]
+
+Here we provide a longer description of how our action works.
+
+Optional arguments:
+  -h, --help            Show this help message and exit.
+  -f, --force           Push and overwrite any existing state
+  --protocol {ftp,webdav,scp}
+                        Specify the protocol to use. This parameter may 
+                        alternatively be specified via the WIDGET_PROTOCOL 
+                        environment variable. The default value is "scp".

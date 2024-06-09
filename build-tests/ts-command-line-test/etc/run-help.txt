@@ -1,0 +1,14 @@
+Running "widget run --help":
+usage: widget run [-h] [--title TITLE] ...
+
+This demonstrates how to use the defineCommandLineRemainder() API.
+
+Positional arguments:
+  "..."          The remaining arguments are passed along to the command 
+                 shell.
+
+Optional arguments:
+  -h, --help     Show this help message and exit.
+  --title TITLE  An optional title to show in the console window. This 
+                 parameter may alternatively be specified via the 
+                 WIDGET_TITLE environment variable.

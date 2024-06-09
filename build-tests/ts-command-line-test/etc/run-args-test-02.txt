@@ -1,0 +1,4 @@
+Running "widget run 1 2 3":
+Business logic configured the logger: verbose=false
+Console Title: Default title
+Arguments to be executed: ["1","2","3"]

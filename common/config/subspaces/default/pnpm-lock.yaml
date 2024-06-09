@@ -2281,6 +2281,18 @@ importers:
 
   ../../../build-tests/ts-command-line-test:
     devDependencies:
+      '@rushstack/heft':
+        specifier: workspace:*
+        version: link:../../apps/heft
+      '@rushstack/heft-node-rig':
+        specifier: workspace:*
+        version: link:../../rigs/heft-node-rig
+      '@rushstack/node-core-library':
+        specifier: workspace:*
+        version: link:../../libraries/node-core-library
+      '@rushstack/terminal':
+        specifier: workspace:*
+        version: link:../../libraries/terminal
       '@rushstack/ts-command-line':
         specifier: workspace:*
         version: link:../../libraries/ts-command-line
@@ -2290,6 +2302,9 @@ importers:
       fs-extra:
         specifier: ~7.0.1
         version: 7.0.1
+      jest-diff:
+        specifier: ~29.7.0
+        version: 29.7.0
       typescript:
         specifier: ~5.4.2
         version: 5.4.2
