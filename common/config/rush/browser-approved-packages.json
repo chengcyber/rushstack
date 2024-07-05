@@ -101,6 +101,10 @@
     {
       "name": "tslib",
       "allowedCategories": [ "libraries", "tests", "vscode-extensions" ]
+    },
+    {
+      "name": "yargs",
+      "allowedCategories": [ "libraries" ]
     }
   ]
 }

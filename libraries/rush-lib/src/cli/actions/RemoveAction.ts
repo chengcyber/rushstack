@@ -36,7 +36,6 @@ export class RemoveAction extends BaseAddAndRemoveAction {
     this._packageNameList = this.defineStringListParameter({
       parameterLongName: '--package',
       parameterShortName: '-p',
-      required: true,
       argumentName: 'PACKAGE',
       description:
         'The name of the package which should be removed.' +

@@ -11,6 +11,7 @@ import type {
   IPackageJsonUpdaterRushBaseUpdateOptions
 } from '../../logic/PackageJsonUpdaterTypes';
 import { RushConstants } from '../../logic/RushConstants';
+import { AlreadyReportedError } from '@rushstack/node-core-library';
 
 export interface IBasePackageJsonUpdaterRushOptions {
   /**
@@ -40,7 +41,14 @@ export abstract class BaseAddAndRemoveAction extends BaseRushAction {
   protected abstract readonly _packageNameList: CommandLineStringListParameter;
 
   protected get specifiedPackageNameList(): readonly string[] {
-    return this._packageNameList.values!;
+    console.log('111', this._packageNameList.values);
+    console.log('222', this.remainder!.values);
+    const list: string[] = this._packageNameList.values!.concat(this.remainder!.values);
+    if (list.length === 0) {
+      this.parser.terminal.writeLine('At least one package name is required. Please use "-p/--package" argument');
+      throw new AlreadyReportedError();
+    }
+    return list;
   }
 
   public constructor(options: IBaseRushActionOptions) {
@@ -51,6 +59,10 @@ export abstract class BaseAddAndRemoveAction extends BaseRushAction {
       parameterShortName: '-s',
       description:
         'If specified, the "rush update" command will not be run after updating the package.json files.'
+    });
+
+    this.defineCommandLineRemainder({
+      description: 'The remaining parameters are treated as package names.'
     });
   }
 
